@@ -9,9 +9,13 @@ def create_app(test_config=None):
     else: 
         app.config.from_file('config.json', load=json.load, silent=True)
 
-    # blueprints
+    from codeduel import auth
+    from codeduel import models
 
-    # init_apps
+    app.register_blueprint(auth.bp)
+
+    models.db.init_app(app)
+    auth.argon2.init_app(app)
 
     with app.app_context():
         db.create_all()
