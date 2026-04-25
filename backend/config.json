@@ -1,0 +1,8 @@
+{
+    "SECRET_KEY": "<secret key>",
+    "PEPPER": "<pepper.",
+    "SQLALCHEMY_DATABASE_URI": "sqlite:///grades.sqlite",
+    "JWT_COOKIE_SECURE": false,
+    "JWT_COOKIE_CSRF_PROTECT": false,
+    "JWT_TOKEN_LOCATION": ["cookies"]
+}
