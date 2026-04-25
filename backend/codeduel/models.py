@@ -18,7 +18,6 @@ class Problem(db.Model):
     id: Mapped[int] = mapped_column(Identity(), primary_key=True)
     description: Mapped[str]
     solver_url: Mapped[str] = mapped_column(nullable=False)
-    default_test_cases: Mapped[JSON]
 
 class TestCase(db.Model):
     id: Mapped[int] = mapped_column(Identity(), primary_key=True)
