@@ -4,7 +4,6 @@ from flask_argon2 import Argon2
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager, set_access_cookies, unset_jwt_cookies
 
 from codeduel.models import db, User
-from codeduel.game import sio
 
 jwt = JWTManager()
 argon2 = Argon2()

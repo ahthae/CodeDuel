@@ -1,6 +1,8 @@
 import json
 from flask import Flask
 
+from codeduel.game import sio
+
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
 
@@ -23,3 +25,6 @@ def create_app(test_config=None):
         models.db.create_all()
 
     return app
+
+if __name__ == "__main__":
+    sio.run(create_app())

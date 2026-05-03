@@ -1,3 +1,4 @@
+import uuid
 from typing import Optional
 
 from flask_sqlalchemy import SQLAlchemy
@@ -48,15 +49,15 @@ class TestCase(db.Model):
         }
 
 class Duel(db.Model):
-    id: Mapped[int] = mapped_column(Identity(), primary_key=True)
-    player1: Mapped[int] = mapped_column(ForeignKey(User.id))
-    player2: Mapped[int] = mapped_column(ForeignKey(User.id))
-    problem: Mapped[int] = mapped_column(ForeignKey(Problem.id))
-    winner: Mapped[int] # 1 or 2 for player 1 and player 2 respectively
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid7)
+    player1: Mapped[int|None] = mapped_column(ForeignKey(User.id))
+    player2: Mapped[int|None] = mapped_column(ForeignKey(User.id))
+    problem: Mapped[int|None] = mapped_column(ForeignKey(Problem.id))
+    winner: Mapped[int|None] # 1 or 2 for player 1 and player 2 respectively
 
     def to_dict(self):
         return {
-            'id': self.id,
+            'id': self.id.int,
             'player1': self.player1,
             'player2': self.player2,
             'problem': self.problem,
