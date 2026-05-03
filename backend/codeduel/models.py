@@ -8,15 +8,28 @@ from sqlalchemy.types import JSON
 db = SQLAlchemy()
 
 class User(db.Model):
+    def __init__(self, id, username, password):
+        self.id = id
+        self.username = username
+        self.passhash = password
     id: Mapped[int] = mapped_column(primary_key=True, unique=True)
     username: Mapped[str] = mapped_column(unique=True)
-    password: Mapped[str] = mapped_column(nullable=False)
+    passhash: Mapped[str] = mapped_column(nullable=False)
+    role: Mapped[int] = mapped_column(default=0) # 0: user, 9: admin
     games_played: Mapped[int] = mapped_column(default=0)
     games_won: Mapped[int] = mapped_column(default=0)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'games_played': self.games_played,
+            'games_won': self.games_won
+        }
+
 class Problem(db.Model):
     id: Mapped[int] = mapped_column(Identity(), primary_key=True)
-    name; Mapped[str]
+    name: Mapped[str]
     description: Mapped[str]
     solver_url: Mapped[str] = mapped_column(nullable=False)
 
