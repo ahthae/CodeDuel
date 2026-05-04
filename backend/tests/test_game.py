@@ -14,12 +14,18 @@ def test_join_game(client, sio_client):
     sio_client.emit('join_game')
     assert sio.server.environ[sio_client.eio_sid]['saved_session']['game_id'] is not None
 
-def test_join_existing_game(client, sio_client, sio_client2):
-    sio_client.emit('join_game')
-    game_id = sio_client2.get_received()[0]['args'][0]
-    sio_client2.emit('join_game', game_id)
+def test_join_existing_game(game):
+    game_id = game.create_game()
     assert game_id in games
     assert games[game_id].player1 == 1
     assert games[game_id].player2 == 3
-    assert sio_client.get_received()[-1]['name'] == 'start'
-    assert sio_client2.get_received()[-1]['name'] == 'start'
+    assert game.sio_client.get_received()[-1]['name'] == 'start'
+    assert game.sio_client2.get_received()[-1]['name'] == 'start'
+
+def test_editor_update(game):
+    game_id = game.create_game()
+    game.sio_client.emit('editor_update', 'test $editor\n content')
+
+    msg = game.sio_client2.get_received()[-1]
+    assert msg['name'] == 'editor_update'
+    assert msg['args'][0] == 'test $editor\n content'

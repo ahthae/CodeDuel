@@ -1,5 +1,12 @@
 # CodeDuel
 
+## Running
+Start the backend development server with
+```bash
+cd backend
+python codeduel/__init__.py
+```
+
 ## Socket.IO
 In-game communication happens over Socket.IO. The server creates a room for each game instance and players in a game are added to the room.
 

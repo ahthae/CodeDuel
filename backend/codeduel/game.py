@@ -1,7 +1,7 @@
 import uuid
 from enum import Enum
 from flask_socketio import ConnectionRefusedError, join_room, SocketIO
-from flask_jwt_extended import decode_token
+from flask_jwt_extended import verify_jwt_in_request
 from flask import request, session
 
 from codeduel.models import db, Duel
@@ -83,6 +83,10 @@ def join_game(id: int = None) -> None:
         session['game_id'] = game.id
         sio.emit('waiting', game.id.int)
 
+@sio.on('editor_update')
+def editor_update_handler(data: str):
+    sio.emit('editor_update', data, room=session['game_id'].int, skip_sid=request.sid)
+
 @sio.on('start')
 def start_game_handler():
     raise NotImplementedError
@@ -95,9 +99,11 @@ def authenticate_client() -> int:
 
     :returns: :class:`codeduel.models.User` object of authenticated user or None if authentication failed
     """
+    
     if 'access_token_cookie' not in request.cookies:
         raise ConnectionRefusedError('Connection refused by server: unauthenticated.')
-    token = decode_token(request.cookies['access_token_cookie'])
-    if token is None:
-        raise ConnectionRefusedError('Connection refused by server: invalid credentials.')
-    return jwt_lookup_cb(None, token)
+    try:
+        jwt_header, jwt_data = verify_jwt_in_request() # uses the request context pushed by Flask-Socket.IO
+    except:
+        raise ConnectionRefusedError('Connection refused by server: invalid token.')
+    return jwt_lookup_cb(jwt_header, jwt_data)

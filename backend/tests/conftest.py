@@ -58,3 +58,18 @@ def sio_client(app, auth, client):
 def sio_client2(app, auth, client):
     auth.login(username='testusername2', password='testpassword2')
     return SocketIOTestClient(app, sio, flask_test_client=client)
+
+class GameController(object):
+    def __init__(self, sio_client, sio_client2):
+        self.sio_client = sio_client
+        self.sio_client2 = sio_client2
+
+    def create_game(self) -> int:
+        self.sio_client.emit('join_game')
+        game_id = self.sio_client2.get_received()[0]['args'][0]
+        self.sio_client2.emit('join_game', game_id)
+        return game_id
+
+@pytest.fixture
+def game(sio_client, sio_client2):
+    return GameController(sio_client, sio_client2)
