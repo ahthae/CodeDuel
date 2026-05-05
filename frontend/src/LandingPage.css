@@ -19,14 +19,14 @@ html, body, #root {
   font-family: Arial, sans-serif;
 }
 
-/* Title */
+
 .title {
   font-size: 4rem;
   font-weight: bold;
   margin-bottom: 10px;
 }
 
-/* Subtitle */
+
 .subtitle {
   font-size: 1.25rem;
   color: #cbd5e1;
@@ -49,7 +49,6 @@ html, body, #root {
   transition: 0.2s ease-in-out;
 }
 
-/* Login */
 .login {
   background-color: #2563eb;
   color: white;
@@ -59,7 +58,7 @@ html, body, #root {
   background-color: #1d4ed8;
 }
 
-/* Register */
+
 .register {
   background-color: #16a34a;
   color: white;
