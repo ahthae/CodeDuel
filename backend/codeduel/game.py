@@ -64,9 +64,9 @@ def join_game(id: int = None) -> None:
         if id not in games:
             sio.emit('error', 'Game ID not found.', to=request.sid)
             return
-
         try:
             games[id].join(session['user'])
+            db.session.commit()
             join_room(id)
             sio.emit('start', room=id)
         except GameFullException:
