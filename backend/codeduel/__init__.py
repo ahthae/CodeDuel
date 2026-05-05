@@ -1,6 +1,8 @@
 import json
 from flask import Flask
 
+from codeduel.game import sio
+
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
 
@@ -9,15 +11,20 @@ def create_app(test_config=None):
     else: 
         app.config.from_file('config.json', load=json.load, silent=True)
 
-    from codeduel import auth
-    from codeduel import models
+    from codeduel import auth, models, game, user
 
     app.register_blueprint(auth.bp)
+    app.register_blueprint(user.bp)
 
     models.db.init_app(app)
     auth.argon2.init_app(app)
+    auth.jwt.init_app(app)
+    game.sio.init_app(app)
 
     with app.app_context():
-        db.create_all()
+        models.db.create_all()
 
     return app
+
+if __name__ == "__main__":
+    sio.run(create_app())

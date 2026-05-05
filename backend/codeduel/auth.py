@@ -1,3 +1,4 @@
+from random import randint
 from flask import Blueprint, current_app, jsonify, make_response, request, url_for
 from flask_argon2 import Argon2
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager, set_access_cookies, unset_jwt_cookies
@@ -13,17 +14,19 @@ def login():
     username = request.json['username']
     password = request.json['password']
 
-    user = db.session.scalar(db.select(user).where(user.username == username))
+    user = db.session.scalar(db.select(User).where(User.username == username))
     if not user or not check_password(user.passhash, password):
         return jsonify({'message':'Invalid credentials.'}), 401
 
+    # Set JWT
     response = jsonify({'message':'Login successful.'})
     access_token = create_access_token(identity=user)
     set_access_cookies(response, access_token)
+
     return response
 
 @bp.post('/logout')
-@jwt_required
+@jwt_required()
 def logout():
     response = jsonify({'message':'Logout successful.'})
     unset_jwt_cookies(response)
@@ -33,12 +36,16 @@ def logout():
 def register():
     data = request.json
 
-    user = user(
-        username=data['username'],
-        passhash=hash_password(request.json['password']),
+    user = User(
+        generate_user_id(),
+        data['username'],
+        hash_password(request.json['password'])
     )
-    db.session.add(user)
-    db.session.commit()
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except:
+        jsonify({'message':'Failed to register user.'}), 500
 
     return jsonify({
         'id': user.id,
@@ -52,7 +59,7 @@ def jwt_identity_cb(user):
 @jwt.user_lookup_loader
 def jwt_lookup_cb(jwt_header, jwt_data):
     id = int(jwt_data['sub'])
-    return db.session.get(user, id)
+    return db.session.get(User, id)
 
 def pepper_password(password):
     return password+current_app.config['PEPPER']
@@ -62,3 +69,15 @@ def hash_password(password):
 
 def check_password(passhash, password):
     return argon2.check_password_hash(passhash, pepper_password(password))
+
+def generate_user_id():
+    timeout = 10_000
+    id = randint(1, 1000)
+    while db.session.get(User, id) is not None:
+        if timeout == 1:
+            return None
+
+        id = randint(1, 1000)
+        timeout -= 1
+
+    return id
