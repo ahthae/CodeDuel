@@ -1,34 +1,53 @@
 import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@monaco-editor/react';
-import { socket, socket2 } from '../socket';
+import { io } from 'socket.io-client';
 import styles from "./Game.module.css";
 
+const default_editor_text = `#include <iostream>
+
+using namespace std;
+
+int main(){
+    cout << "Hello, world!" << endl;
+    return 0;
+}
+`;
+
+const default_opponent_editor_text = `#include <iostream>
+
+using namespace std;
+
+int main(){
+    cout << "Hello, opponent!" << endl;
+    return 0;
+}
+`;
+
 export default function Game() {
-	const editorRef = useRef(null);
+	const [socket, setSocket] = useState(io('ws://localhost:5000', {autoConnect: false, withCredentials: true}));
+	const [socket2, setSocket2] = useState(io('ws://localhost:5000', {autoConnect: false, withCredentials: true}));
+
 	const opponentEditorRef = useRef(null);
 
-	const handleEditorMount = (editor, moncaco) => {
-		editorRef.current = editor;
-	};
 	const handleOpponentEditorMount = (editor, moncaco) => {
 		opponentEditorRef.current = editor;
 	};
 
 	useEffect(() => {
 		socket.on('connect_error', (err) => {
-			console.log(`Socket 1 error: ${err.name}: ${err.message}`)
+			console.log(`Socket 1 ${err.name}: ${err.message}`)
 		})
 		socket2.on('connect_error', (err) => {
-			console.log(`Socket 2 error: ${err.name}: ${err.message}`)
+			console.log(`Socket 2 ${err.name}: ${err.message}`)
 		})
 
 		socket.on('connect', () => {
 			console.log("Socket connected, joining\n");
-			socket.emit('join_game');
+			socket.emit('join');
 		});
 		socket2.on("waiting", (game_id) => {
 			console.log("Received game ID, joining\n")
-			socket2.emit('join_game', game_id); 
+			socket2.emit('join', game_id); 
 		});
 		socket2.on('editor_update', updateOpponentEditor);
 
@@ -53,8 +72,7 @@ export default function Game() {
 	return (
 	<>
 		<Editor className={styles.Editor}
-				onMount={handleEditorMount}
-				defaultValue={"#include <iostream>\n\nusing namespace std;\n\nint main(){\n    cout << \"Hello, world!\" << endl;\n\n    return 0;\n}\n"}
+				defaultValue={default_editor_text}
 				defaultLanguage="cpp"
 				options={{readOnly: false}}
 				onChange={(value, ev) => { 
@@ -64,7 +82,7 @@ export default function Game() {
 		/>
 		<Editor className={styles.Editor}
 				onMount={handleOpponentEditorMount}
-				defaultValue={"#include <iostream>\n\nusing namespace std;\n\nint main(){\n    cout << \"Hello, opponent!\" << endl;\n\n    return 0;\n}\n"}
+				defaultValue={default_opponent_editor_text}
 				defaultLanguage="cpp"
 				options={{readOnly: true}}
 		/>

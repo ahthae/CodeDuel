@@ -54,7 +54,7 @@ def connect_handler(auth: dict) -> None:
     user = authenticate_client()
     session['user'] = user
 
-@sio.on('join_game')
+@sio.on('join')
 def join_game(id: str = None) -> None:
     """Creates a game instance and waits for another player to join, or joins another game instance.
 

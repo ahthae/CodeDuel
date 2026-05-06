@@ -13,7 +13,7 @@ def test_connect(sio_client):
     assert sio.server.environ[sio_client.eio_sid]['saved_session']['user'] is not None
 
 def test_join_game(client, sio_client):
-    sio_client.emit('join_game')
+    sio_client.emit('join')
     assert sio.server.environ[sio_client.eio_sid]['saved_session']['game_id'] is not None
 
 def test_join_existing_game(game):

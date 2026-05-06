@@ -65,9 +65,9 @@ class GameController(object):
         self.sio_client2 = sio_client2
 
     def create_game(self) -> int:
-        self.sio_client.emit('join_game')
+        self.sio_client.emit('join')
         game_id = self.sio_client2.get_received()[0]['args'][0]
-        self.sio_client2.emit('join_game', game_id)
+        self.sio_client2.emit('join', game_id)
         return game_id
 
 @pytest.fixture
