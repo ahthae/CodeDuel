@@ -7,7 +7,7 @@ from codeduel.game import sio
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
-    cors = CORS(app, origins=re.compile(r'http://localhost\d*'), supports_credentials=True) # Allows CORS on localhost for development
+    cors = CORS(app, origins=re.compile(r'http:\/\/localhost:\d*'), supports_credentials=True) # Allows CORS on localhost for development
 
     if test_config is not None:
         app.config.from_mapping(test_config)
