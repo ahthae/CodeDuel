@@ -7,7 +7,7 @@ from flask import request, session
 from codeduel.models import db, Duel
 from codeduel.auth import jwt_lookup_cb
 
-sio = SocketIO()
+sio = SocketIO(cors_allowed_origins='*')
 games = {}
 
 class GameState(Enum):
@@ -55,20 +55,21 @@ def connect_handler(auth: dict) -> None:
     session['user'] = user
 
 @sio.on('join_game')
-def join_game(id: int = None) -> None:
+def join_game(id: str = None) -> None:
     """Creates a game instance and waits for another player to join, or joins another game instance.
 
     :param id: Game UUID as 128-bit integer
     """
     if id is not None:
-        if id not in games:
+        id = uuid.UUID(id)
+        if id.int not in games:
             sio.emit('error', 'Game ID not found.', to=request.sid)
             return
         try:
-            games[id].join(session['user'])
+            games[id.int].join(session['user'])
             db.session.commit()
-            join_room(id)
-            sio.emit('start', room=id)
+            join_room(id.int)
+            sio.emit('start', room=id.int)
         except GameFullException:
             sio.emit('error', 'Game not joinable.', to=request.sid)
     else:
@@ -81,7 +82,7 @@ def join_game(id: int = None) -> None:
         games[game.id.int] = game
         join_room(game.id.int)
         session['game_id'] = game.id
-        sio.emit('waiting', game.id.int)
+        sio.emit('waiting', str(game.id))
 
 @sio.on('editor_update')
 def editor_update_handler(data: str):

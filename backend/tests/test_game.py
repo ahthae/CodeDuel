@@ -1,6 +1,8 @@
 from flask import session
-from codeduel.game import sio, games
 from flask_socketio import SocketIOTestClient
+from uuid import UUID
+
+from codeduel.game import sio, games
 
 def test_connect_unauthorized(app, client):
     sio_client = SocketIOTestClient(app, sio, flask_test_client=client)
@@ -16,6 +18,7 @@ def test_join_game(client, sio_client):
 
 def test_join_existing_game(game):
     game_id = game.create_game()
+    game_id = UUID(game_id).int
     assert game_id in games
     assert games[game_id].player1 == 1
     assert games[game_id].player2 == 3
