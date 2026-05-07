@@ -58,7 +58,7 @@ def connect_handler(auth: dict) -> None:
 def join_game(id: str = None) -> None:
     """Creates a game instance and waits for another player to join, or joins another game instance.
 
-    :param id: Game UUID as 128-bit integer
+    :param id: Game UUID as 128-bit string
     """
     if id is not None:
         id = uuid.UUID(id)
@@ -88,9 +88,10 @@ def join_game(id: str = None) -> None:
 def editor_update_handler(data: str):
     sio.emit('editor_update', data, room=session['game_id'].int, skip_sid=request.sid)
 
-@sio.on('start')
-def start_game_handler():
+@sio.on('submit')
+def submission_handler(data: dict):
     raise NotImplementedError
+
 @sio.on('queue')
 def queue_game_handler():
     raise NotImplementedError

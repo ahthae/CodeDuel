@@ -14,10 +14,12 @@ def create_app(test_config=None):
     else: 
         app.config.from_file('config.json', load=json.load, silent=True)
 
-    from codeduel import auth, models, game, user
+    from codeduel import auth, duel, game, models, problem, user
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(user.bp)
+    app.register_blueprint(duel.bp)
+    app.register_blueprint(problem.bp)
 
     models.db.init_app(app)
     auth.argon2.init_app(app)

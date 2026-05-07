@@ -1,9 +1,9 @@
 import uuid
-from typing import Optional
+from typing import List
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Identity, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
 
 db = SQLAlchemy()
@@ -32,18 +32,27 @@ class Problem(db.Model):
     id: Mapped[int] = mapped_column(Identity(), primary_key=True)
     name: Mapped[str]
     description: Mapped[str]
-    solver_url: Mapped[str] = mapped_column(nullable=False)
-
-class TestCase(db.Model):
-    id: Mapped[int] = mapped_column(Identity(), primary_key=True)
-    problem: Mapped[int] = mapped_column(ForeignKey(Problem.id))
-    input: Mapped[str]
-    output: Mapped[str]
+    test_cases: Mapped[List['TestCase']] = relationship(back_populates='problem', cascade='all, delete-orphan')
 
     def to_dict(self):
         return {
             'id': self.id,
-            'problem': self.problem,
+            'name': self.name,
+            'description': self.description,
+            'test_cases': [test_case.to_dict() for test_case in self.test_cases]
+        }
+
+class TestCase(db.Model):
+    id: Mapped[int] = mapped_column(Identity(), primary_key=True)
+    problem_id: Mapped[int] = mapped_column(ForeignKey(Problem.id))
+    problem: Mapped['Problem'] = relationship(back_populates="test_cases")
+    input: Mapped[str|None]
+    output: Mapped[str|None]
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'problem_id': self.problem_id,
             'input': self.input,
             'output': self.output
         }
