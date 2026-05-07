@@ -1,0 +1,65 @@
+Recall that a permutation of length $N$ is a list of numbers where the numbers $1$ through $N$ occur exactly once.
+
+Given a permutation $P=(p_1,...,p_N)$ output a permutation $Q=(q_1,...,q_N)$ such that for every $i={1,..,N}$, the $p_i$-th element in $Q$ is $i$.
+
+It can be proved that there exist a unique Q that satisfies the condition.
+
+<h2>Input</h2>
+
+The first line will contain $N$ $(1 \le N \le 2 \times 10^5)$, which is the number of elements in $P$.
+
+The next line will contain the permutation $P$ which is of length $N$.
+
+<h2>Output</h2>
+
+Output the permutation $Q$ in one line.
+
+<h2>Examples</h2>
+
+<table>
+    <th>Input</th>
+    <tr>
+        <td>
+            <pre><code>3
+2 3 1</code></pre>
+        </td>
+    </tr>
+    <th>Output</th>
+    <tr>
+        <td>
+            <pre><code>3 1 2</code></pre>
+        </td>
+    </tr>
+</table>
+
+<table>
+    <th>Input</th>
+    <tr>
+        <td>
+            <pre><code>3
+1 2 3</code></pre>
+        </td>
+    </tr>
+    <th>Output</th>
+    <tr>
+        <td>
+            <pre><code>1 2 3</code></pre>
+        </td>
+    </tr>
+</table>
+
+<table>
+    <th>Input</th>
+    <tr>
+        <td>
+            <pre><code>5
+5 3 2 4 1</code></pre>
+        </td>
+    </tr>
+    <th>Output</th>
+    <tr>
+        <td>
+            <pre><code>5 3 2 4 1</code></pre>
+        </td>
+    </tr>
+</table>

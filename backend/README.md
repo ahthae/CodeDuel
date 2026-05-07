@@ -1,11 +1,17 @@
 # CodeDuel
 
 ## Running
-Start the backend development server with
+Copy the example `config.json` into the Flask instance folder
 ```bash
 cd backend
+mkdir instance
+cp config.json instance/config.json
+```
+then, start the backend development server with
+```bash
 python codeduel/__init__.py
 ```
+
 Start the frontend development server with
 ```bash
 cd frontend
@@ -40,3 +46,6 @@ Re-broadcast by server to the game room so the other player's client can update.
 
 Arguments:
 - content - string containing the new editor content. Represents the entire content, not just a diff.
+
+## Credits
+Example problem data taken from Competitive Coding Club at UC Riverside with permission.

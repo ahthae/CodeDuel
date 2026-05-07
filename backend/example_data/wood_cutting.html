@@ -1,0 +1,88 @@
+You are given a long piece of timber that is of length $L$ meters. For each $x={1,2,...,L-1}$ there is a mark that is placed at $x$ meters from the left end of the piece.
+
+You are given $Q$ queries and the $i$-th query is represented as a pair of numbers $(c_i,x_i)$.
+
+<ul>
+    <li>If $c_i = 1$, you cut the timber just to the right of the mark placed at position $x$. This will make the piece that you cut into two different pieces.</li>
+    <li>If $c_i=2$, you choose the piece that has a mark placed at position $x$ and print its length.</li>
+</ul>
+
+It is guaranteed that there will be no cut ade at the mark $x_i$ when the query is to be processed. The cuts are permanent and last after the query they were made.
+
+<h2>Input</h2>
+
+The first line contains $L$ $(1 \le L \le 10^9)$ and $Q$ $(1 \le Q \le 2  \times 10^5)$, the initial length of the timer and the number of queries you will be asked.
+
+The next $Q$ lines contain a pair of integers $(c_i,x_i)$ $(1 \le x_i \le L-1)$, the type of the query and the mark that you need to process.
+
+<h2>Output</h2>
+
+You should have the same number of lines as the number of type $2$ queries.
+
+<h2>Examples</h2>
+
+<table>
+    <th>Input</th>
+    <tr>
+        <td>
+            <pre><code>5 3
+2 2
+1 3
+2 2</code></pre>
+        </td>
+    </tr>
+    <th>Output</th>
+    <tr>
+        <td>
+            <pre><code>4
+2</code></pre>
+        </td>
+    </tr>
+</table>
+
+<table>
+    <th>Input</th>
+    <tr>
+        <td>
+            <pre><code>5 3
+1 2
+1 4
+2 3</code></pre>
+        </td>
+    </tr>
+    <th>Output</th>
+    <tr>
+        <td>
+            <pre><code>2</code></pre>
+        </td>
+    </tr>
+</table>
+
+<table>
+    <th>Input</th>
+    <tr>
+        <td>
+            <pre><code>100 10
+1 31
+2 41
+1 59
+2 26
+1 53
+2 58
+1 97
+2 93
+1 23
+2 84</code></pre>
+        </td>
+    </tr>
+    <th>Output</th>
+    <tr>
+        <td>
+            <pre><code>69
+31
+6
+38
+38</code></pre>
+        </td>
+    </tr>
+</table>

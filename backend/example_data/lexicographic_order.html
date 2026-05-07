@@ -1,0 +1,70 @@
+You ae given two strings $S$ and $T$. If $S$ is lexicographically smaller than $T$, print `Yes`. Otherwise, print `No`.
+
+Refer to the notes section for what a lexicographical ordering is.
+
+<h2>Input</h2>
+
+You wil be given two strings $S$ and $T$ on one line separated by a space.
+
+It is guaranteed that $1\le|S|,|T|\le10$ and that both strings only consist of lowercase English letters.
+
+<h2>Examples</h2>
+
+<table>
+    <th>Input</th>
+    <tr>
+        <td>
+            <pre><code>abc atcoder</code></pre>
+        </td>
+    </tr>
+    <th>Output</th>
+    <tr>
+        <td>
+            <pre><code>Yes</code></pre>
+        </td>
+    </tr>
+</table>
+
+<table>
+    <th>Input</th>
+    <tr>
+        <td>
+            <pre><code>arc agc</code></pre>
+        </td>
+    </tr>
+    <th>Output</th>
+    <tr>
+        <td>
+            <pre><code>No</code></pre>
+        </td>
+    </tr>
+</table>
+
+<table>
+    <th>Input</th>
+    <tr>
+        <td>
+            <pre><code>a aa</code></pre>
+        </td>
+    </tr>
+    <th>Output</th>
+    <tr>
+        <td>
+            <pre><code>Yes</code></pre>
+        </td>
+    </tr>
+</table>
+
+<h2>Note</h2>
+
+The intutitve definition of a lexicographical ordering is just the dictionary orering, or alphabetical ordering.
+
+Given two strings $S$ and $T$, the formal definition is as follows.
+
+<ul>
+    <li>Let $L$ be $\text{min}(|S|,|T|)$ (i.e. $L$ is the length of the smaller string). For the characters $s_1,...,s_L$ in $S$ and $t_1,...t_L$ in $T$, if there is a position $i$ such that $s_i<t_i$ then we say that $S<T$, or $S$ is lexicographically smaller than $T$. If $s_i>t_i$ then we say that $S>T$, or $S$ is lexicographically larger than $T$.</li>
+
+    <li>If for all $i={1,...,L}$, $s_i=t_i$, and $|S|<|T|$, then $S<T$. Similarly, if $|S|>|T|$, then $S>T$. This means that $S$ is a proper prefix of $T$ or $T$ is a proper prefix of $S$.</li>
+
+    <li>Otherwise, this means that $L=|S|=|T|$, and in this case, $S=T$.</li>
+</ul>
