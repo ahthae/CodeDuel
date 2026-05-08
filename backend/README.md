@@ -10,6 +10,8 @@ cd backend
 mkdir instance
 cp instance/example_config.json instance/config.json
 ```
+and put set passwords for REDIS_PASSWORD and POSTGRES_PASSWORD in docker/judge0/judge0.conf
+
 Then, start the Judge0 server
 ```bash
 cd docker/judge0
