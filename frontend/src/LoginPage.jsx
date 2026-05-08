@@ -12,11 +12,11 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRF-Token": Cookies.get('csrf_access_token') // needed for JWT dobule submit
+          // "X-CSRF-Token": Cookies.get('csrf_access_token') // needed for JWT dobule submit
         },
         credentials: "include", // important for JWT cookies
         body: JSON.stringify({
@@ -25,12 +25,14 @@ export default function LoginPage() {
         }),
       });
 
-      if (response.ok) {
-        // login success → go to lobby (
-        navigate("/lobby");
-      } else {
-        alert("Invalid username or password");
-      }
+      const data = await response.json();
+
+    if (response.ok) {
+      navigate("/lobby");
+    } else {
+      alert(data.message || "Request failed");
+    }
+
     } catch (error) {
       console.error("Login error:", error);
       alert("Server error. Is your backend running?");
