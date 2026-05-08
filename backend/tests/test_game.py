@@ -52,6 +52,8 @@ int main() {
 
     game.sio_client.emit('submission', code)
 
+    # TODO add test case ID, compiler output, and output logs to results
+    # TODO maybe add submission ID
     received = game.sio_client.get_received()[-1]
     assert received['name'] == 'submission'
     assert received['args'][0][0]['id'] == 3 # Accepted
