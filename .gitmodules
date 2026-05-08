@@ -1,0 +1,3 @@
+[submodule "backend/docker/judge0"]
+	path = backend/docker/judge0
+	url = git@github.com:judge0/judge0.git
