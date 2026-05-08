@@ -80,9 +80,9 @@
         }
     ],
     "duels": [
-        {"player1": "OMEGALUL", "player2": "Green_staR", "problem": 1, "winner": 1},
-        {"player1": "seinen", "player2": "OMEGALUL", "problem": 1, "winner": 0},
-        {"player1": "Belzona_4311", "player2": "SatoruGojo", "problem": 4, "winner": 0},
-        {"player1": "parttime_plumber89", "player2": "SatoruGojo", "problem": 3, "winner": 1}
+        {"player1": 2, "player2": 1, "problem": 1, "winner": 1},
+        {"player1": 0, "player2": 2, "problem": 1, "winner": 0},
+        {"player1": 5, "player2": 4, "problem": 4, "winner": 0},
+        {"player1": 3, "player2": 4, "problem": 3, "winner": 1}
     ]
 }

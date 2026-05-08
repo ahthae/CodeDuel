@@ -5,7 +5,7 @@ Copy the example `config.json` into the Flask instance folder
 ```bash
 cd backend
 mkdir instance
-cp config.json instance/config.json
+cp instance/example_config.json instance/config.json
 ```
 then, start the backend development server with
 ```bash
