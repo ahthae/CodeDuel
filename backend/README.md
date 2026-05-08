@@ -1,6 +1,9 @@
 # CodeDuel
 
 ## Running
+First, make sure to pull submodules
+`git clone git@github.com:ahthae/CodeDuel.git --recursive`
+
 Copy the example `config.json` into the Flask instance folder
 ```bash
 cd backend
