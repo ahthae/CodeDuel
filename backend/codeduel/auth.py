@@ -7,10 +7,12 @@ from codeduel.models import db, User
 
 jwt = JWTManager()
 argon2 = Argon2()
-bp = Blueprint('auth', __name__)
+bp = Blueprint('auth', __name__, url_prefix='/api')
 
 @bp.post('/login')
 def login():
+    print("LOGIN REQUEST JSON:", request.json)
+    
     username = request.json['username']
     password = request.json['password']
 
@@ -20,7 +22,7 @@ def login():
 
     # Set JWT
     response = jsonify({'message':'Login successful.'})
-    access_token = create_access_token(identity=user)
+    access_token = create_access_token(identity=str(user.id))
     set_access_cookies(response, access_token)
 
     return response
@@ -36,6 +38,9 @@ def logout():
 def register():
     data = request.json
 
+    if db.session.scalar(db.select(User).where(User.username == data['username'])):
+        return jsonify({'message': 'Username already exists'}), 409
+
     user = User(
         generate_user_id(),
         data['username'],
@@ -44,22 +49,23 @@ def register():
     try:
         db.session.add(user)
         db.session.commit()
-    except:
-        jsonify({'message':'Failed to register user.'}), 500
+    except Exception as e:
+        print("REGISTER ERROR:", e)
+        return jsonify({'message': str(e)}), 500
 
     return jsonify({
         'id': user.id,
         'username': user.username,
         }), 201, { 'Location': url_for('user.user', id=user.id) }
 
-@jwt.user_identity_loader
-def jwt_identity_cb(user):
-    return str(user.id)
+# @jwt.user_identity_loader
+# def jwt_identity_cb(user_id):
+#     return user_id
 
 @jwt.user_lookup_loader
 def jwt_lookup_cb(jwt_header, jwt_data):
-    id = int(jwt_data['sub'])
-    return db.session.get(User, id)
+    user_id = int(jwt_data["sub"])
+    return db.session.get(User, user_id)
 
 def pepper_password(password):
     return password+current_app.config['PEPPER']
@@ -72,12 +78,12 @@ def check_password(passhash, password):
 
 def generate_user_id():
     timeout = 10_000
-    id = randint(1, 1000)
-    while db.session.get(User, id) is not None:
-        if timeout == 1:
-            return None
+    user_id = randint(1, 1000)
 
-        id = randint(1, 1000)
+    while db.session.get(User, user_id) is not None:
+        user_id = randint(1, 1000)
         timeout -= 1
+        if timeout <= 0:
+            raise Exception("Could not generate unique user id")
 
-    return id
+    return user_id

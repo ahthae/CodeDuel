@@ -4,7 +4,7 @@ from flask_socketio import ConnectionRefusedError, join_room, SocketIO
 from flask_jwt_extended import verify_jwt_in_request
 from flask import request, session
 
-from codeduel.models import db, Duel
+from codeduel.models import db, Duel, User
 from codeduel.auth import jwt_lookup_cb
 
 sio = SocketIO(cors_allowed_origins='*')

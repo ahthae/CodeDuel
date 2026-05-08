@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Identity, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
+from typing import Optional
 
 db = SQLAlchemy()
 
@@ -44,10 +45,13 @@ class Problem(db.Model):
 
 class TestCase(db.Model):
     id: Mapped[int] = mapped_column(Identity(), primary_key=True)
-    problem_id: Mapped[int] = mapped_column(ForeignKey(Problem.id))
-    problem: Mapped['Problem'] = relationship(back_populates="test_cases")
-    input: Mapped[str|None]
-    output: Mapped[str|None]
+
+    problem_id: Mapped[int] = mapped_column(ForeignKey("problem.id"))
+
+    problem: Mapped["Problem"] = relationship(back_populates="test_cases")
+
+    input: Mapped[Optional[str]]
+    output: Mapped[Optional[str]]
 
     def to_dict(self):
         return {
@@ -58,11 +62,11 @@ class TestCase(db.Model):
         }
 
 class Duel(db.Model):
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid7)
-    player1: Mapped[int|None] = mapped_column(ForeignKey(User.id))
-    player2: Mapped[int|None] = mapped_column(ForeignKey(User.id))
-    problem: Mapped[int|None] = mapped_column(ForeignKey(Problem.id))
-    winner: Mapped[int|None] # 1 or 2 for player 1 and player 2 respectively
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    player1: Mapped[Optional[int]] = mapped_column(ForeignKey(User.id))
+    player2: Mapped[Optional[int]] = mapped_column(ForeignKey(User.id))
+    problem: Mapped[Optional[int]] = mapped_column(ForeignKey(Problem.id))
+    winner: Mapped[Optional[int]] = mapped_column(nullable=True) # 1 or 2 for player 1 and player 2 respectively
 
     def to_dict(self):
         return {
