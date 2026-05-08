@@ -22,7 +22,7 @@ def login():
 
     # Set JWT
     response = jsonify({'message':'Login successful.'})
-    access_token = create_access_token(identity=str(user.id))
+    access_token = create_access_token(identity=user)
     set_access_cookies(response, access_token)
 
     return response
@@ -58,9 +58,9 @@ def register():
         'username': user.username,
         }), 201, { 'Location': url_for('user.user', id=user.id) }
 
-# @jwt.user_identity_loader
-# def jwt_identity_cb(user_id):
-#     return user_id
+@jwt.user_identity_loader
+def jwt_identity_cb(user):
+    return str(user.id)
 
 @jwt.user_lookup_loader
 def jwt_lookup_cb(jwt_header, jwt_data):
