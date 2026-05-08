@@ -23,9 +23,9 @@ def app():
     with app.app_context():
         from codeduel.models import Duel, db, Problem, TestCase, User
         from codeduel.auth import hash_password
-        user = User(1, 'testusername', hash_password('testpassword'))
-        user2 = User(3, 'testusername2', hash_password('testpassword2'))
-        admin = User(2, 'testadmin', hash_password('testadminpass'))
+        user = User(id=1, username='testusername', passhash=hash_password('testpassword'))
+        user2 = User(id=3, username='testusername2', passhash=hash_password('testpassword2'))
+        admin = User(id=2, username='testadmin', passhash=hash_password('testadminpass'))
         admin.role = 9
         db.session.add_all(
             [
@@ -76,10 +76,10 @@ class AuthController(object):
         self.client = client
 
     def login(self, username='testusername', password='testpassword'):
-        return self.client.post('/login', json={'username': username, 'password': password})
+        return self.client.post('/api/login', json={'username': username, 'password': password})
     
     def logout(self):
-        return self.client.post('/logout')
+        return self.client.post('/api/logout')
 
 @pytest.fixture
 def auth(client):

@@ -8,7 +8,7 @@ def test_register(client, app):
         'password': 'thisisapassword',
     }
 
-    response = client.post('/register', json=data)
+    response = client.post('/api/register', json=data)
     assert response.status_code == 201
 
     assert response.json['username'] == data['username']
@@ -42,12 +42,12 @@ def test_login(client, app):
         db.session.commit()
 
     # Invalid login
-    response = client.post('/login', json=bad_data)
+    response = client.post('/api/login', json=bad_data)
     assert response.status_code == 401
     assert client.get_cookie('access_token_cookie') is None
 
     # Valid login
-    response = client.post('/login', json=data)
+    response = client.post('/api/login', json=data)
     assert response.status_code == 200
     assert client.get_cookie('access_token_cookie') is not None
 

@@ -4,7 +4,7 @@ from flask_jwt_extended import current_user, jwt_required
 from codeduel.models import db, User
 from codeduel.auth import hash_password
 
-bp = Blueprint('user', __name__, url_prefix='/user')
+bp = Blueprint('user', __name__, url_prefix='/api/user')
 
 @bp.get('/')
 @jwt_required()
@@ -24,9 +24,9 @@ def user_put():
 
     try:
         user = User(
-            data['id'],
-            data['username'],
-            hash_password(data['password']),
+            id=data['id'],
+            username=data['username'],
+            passhash=hash_password(data['password']),
         )
     except KeyError:
         return jsonify({'message':'Missing required data.'}), 400

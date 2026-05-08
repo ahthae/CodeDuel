@@ -42,9 +42,9 @@ def register():
         return jsonify({'message': 'Username already exists'}), 409
 
     user = User(
-        generate_user_id(),
-        data['username'],
-        hash_password(request.json['password'])
+        id=generate_user_id(),
+        username=data['username'],
+        passhash=hash_password(request.json['password'])
     )
     try:
         db.session.add(user)

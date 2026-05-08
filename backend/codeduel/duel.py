@@ -3,7 +3,7 @@ from uuid import UUID
 
 from codeduel.models import db, Duel, User
 
-bp = Blueprint('duel', __name__, url_prefix='/duel')
+bp = Blueprint('duel', __name__, url_prefix='/api/duel')
 
 @bp.get('/')
 def duel_get_all():

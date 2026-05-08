@@ -1,11 +1,11 @@
 def test_problem_get_all(client):
-    response = client.get('/problem/')
+    response = client.get('/api/problem/')
     assert response.status_code == 200
     assert len(response.json) > 1
 
 def test_problem_get(client):
     id = 1
-    response = client.get(f'/problem/{id}')
+    response = client.get(f'/api/problem/{id}')
     assert response.status_code == 200
     assert response.json['id'] == 1
     assert response.json['name'] == 'Test Problem'

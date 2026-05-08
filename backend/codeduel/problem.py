@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from codeduel.models import db, Problem
 
-bp = Blueprint('problem', __name__, url_prefix='/problem')
+bp = Blueprint('problem', __name__, url_prefix='/api/problem')
 
 @bp.get('/')
 def problem_get_all():

@@ -10,10 +10,6 @@ from typing import Optional
 db = SQLAlchemy()
 
 class User(db.Model):
-    def __init__(self, id, username, password):
-        self.id = id
-        self.username = username
-        self.passhash = password
     id: Mapped[int] = mapped_column(primary_key=True, unique=True)
     username: Mapped[str] = mapped_column(unique=True)
     passhash: Mapped[str] = mapped_column(nullable=False)
@@ -45,11 +41,8 @@ class Problem(db.Model):
 
 class TestCase(db.Model):
     id: Mapped[int] = mapped_column(Identity(), primary_key=True)
-
-    problem_id: Mapped[int] = mapped_column(ForeignKey("problem.id"))
-
-    problem: Mapped["Problem"] = relationship(back_populates="test_cases")
-
+    problem_id: Mapped[int] = mapped_column(ForeignKey('problem.id'))
+    problem: Mapped['Problem'] = relationship(back_populates='test_cases')
     input: Mapped[Optional[str]]
     output: Mapped[Optional[str]]
 

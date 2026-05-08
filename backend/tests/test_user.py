@@ -6,7 +6,7 @@ from codeduel.auth import check_password, hash_password
 
 def test_user_get_all(client, app, auth):
     auth.login(username='testadmin', password='testadminpass')
-    response = client.get('/user/')
+    response = client.get('/api/user/')
     assert response.status_code == 200
     users = response.json
     assert len(users) > 1
@@ -16,7 +16,7 @@ def test_user_get(client, app):
     username='testusername'
     name='testpassword'
  
-    response = client.get(f'/user/{id}')
+    response = client.get(f'/api/user/{id}')
     assert response.status_code == 200
  
     assert response.json['id'] == id
@@ -32,11 +32,11 @@ def test_user_put(client, app, auth):
         'password':'newtesttest',
     }
 
-    response = client.put(f'/user/', json=data)
+    response = client.put(f'/api/user/', json=data)
     assert response.status_code == 401
 
     auth.login(username='testadmin', password='testadminpass')
-    response = client.put(f'/user/', json=data)
+    response = client.put(f'/api/user/', json=data)
     assert response.status_code == 201
 
     with app.app_context():
@@ -49,18 +49,18 @@ def test_user_update(client, app, auth):
     id = 1
     data = { 'username': 'updated' }
 
-    response = client.post(f'/user/{id}', json=data)
+    response = client.post(f'/api/user/{id}', json=data)
     assert response.status_code == 403
 
     auth.login(username='testadmin', password='testadminpass')
-    response = client.post(f'/user/{id}', json=data)
+    response = client.post(f'/api/user/{id}', json=data)
     assert response.status_code == 200
     assert response.json['username'] == 'updated'
 
 def test_user_delete(client, app):
     id = 1
 
-    assert client.delete(f'/user/{id}').status_code == 204
+    assert client.delete(f'/api/user/{id}').status_code == 204
 
     with app.app_context():
         assert db.session.get(User, id) is None
