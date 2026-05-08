@@ -88,7 +88,7 @@ def join_game(id: str = None) -> None:
 def editor_update_handler(data: str):
     sio.emit('editor_update', data, room=session['game_id'].int, skip_sid=request.sid)
 
-@sio.on('submit')
+@sio.on('submission')
 def submission_handler(data: dict):
     raise NotImplementedError
 

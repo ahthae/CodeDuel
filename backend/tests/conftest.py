@@ -62,7 +62,15 @@ def app():
             output='test case 2 output test',
             problem=problem
         )
-        db.session.add_all((user, user2, admin, problem, test_case, problem2, test_case2))
+        test_case3 = TestCase(
+            input='test case 3 input test',
+            output='test case 3 output test',
+            problem=problem
+        )
+        problem.test_cases.append(test_case)
+        problem2.test_cases.append(test_case2)
+        problem2.test_cases.append(test_case3)
+        db.session.add_all((user, user2, admin, problem, test_case, problem2, test_case2, test_case3))
         db.session.commit()
 
     yield app
