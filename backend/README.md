@@ -9,6 +9,10 @@ cp instance/example_config.json instance/config.json
 ```
 then, start the backend development server with
 ```bash
+python run.py
+```
+or
+```bash
 python codeduel/__init__.py
 ```
 
