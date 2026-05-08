@@ -11,6 +11,7 @@ def app():
     tmp_fd, tmp_path = tempfile.mkstemp()
 
     app = create_app({
+        'JUDGE_URL': 'http://localhost:2358',
         'SECRET_KEY': 'secretkeysecretkeysecretkeysecretkey',
         'PEPPER': 'pepper',
         'SQLALCHEMY_DATABASE_URI': f'sqlite:///{tmp_path}.sqlite',

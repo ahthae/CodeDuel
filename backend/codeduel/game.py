@@ -1,10 +1,11 @@
+import requests
 import uuid
 from enum import Enum
 from flask_socketio import ConnectionRefusedError, join_room, SocketIO
 from flask_jwt_extended import verify_jwt_in_request
-from flask import request, session
+from flask import current_app, request, session
 
-from codeduel.models import db, Duel, User
+from codeduel.models import db, Duel, Problem, User
 from codeduel.auth import jwt_lookup_cb
 
 sio = SocketIO(cors_allowed_origins='*')
@@ -90,7 +91,22 @@ def editor_update_handler(data: str):
 
 @sio.on('submission')
 def submission_handler(data: dict):
-    raise NotImplementedError
+    problem = db.session.get(Problem, games[session['game_id'].int].problem)
+    results = [0 for _ in range(len(problem.test_cases))]
+    i = 0
+    for test_case in problem.test_cases:
+        r = requests.post(current_app.config['JUDGE_URL']+'/submissions?wait=true', json={
+            'source_code': data,
+            'language_id': 54,
+            'stdin': test_case.input,
+            'expected_output': test_case.output
+        })
+        j = r.json()
+        print(j)
+        results[i] = j['status']
+        i += 1
+    sio.emit('submission', results, to=request.sid)
+
 
 @sio.on('queue')
 def queue_game_handler():

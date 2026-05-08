@@ -3,6 +3,7 @@ from flask_socketio import SocketIOTestClient
 from uuid import UUID
 
 from codeduel.game import sio, games
+from codeduel.models import db
 
 def test_connect_unauthorized(app, client):
     sio_client = SocketIOTestClient(app, sio, flask_test_client=client)
@@ -33,6 +34,7 @@ def test_editor_update(game):
     assert msg['name'] == 'editor_update'
     assert msg['args'][0] == 'test $editor\n content'
 
+# TODO rewrite this test to work without needed a Judge0 instance running
 def test_submit(game):
     game_id = game.create_game()
     code = r'''#include <iostream>
@@ -43,9 +45,14 @@ int main() {
     cout << "test case 2 output test\n";
     return 0;
 }'''
-    game.sio_client.emit('submit', code)
 
-    received = game.sio_client.get_received()
-    assert received[0]['name'] == 'submission'
-    assert received[0]['args'][0] == True
-    assert received[0]['args'][1] == False
+    with game.sio_client.app.app_context():
+        games[UUID(game_id).int].problem = 2
+        db.session.commit()
+
+    game.sio_client.emit('submission', code)
+
+    received = game.sio_client.get_received()[-1]
+    assert received['name'] == 'submission'
+    assert received['args'][0][0]['id'] == 3 # Accepted
+    assert received['args'][0][1]['id'] == 4 # Wrong  Answer

@@ -7,7 +7,14 @@ cd backend
 mkdir instance
 cp instance/example_config.json instance/config.json
 ```
-then, start the backend development server with
+Then, start the Judge0 server
+```bash
+cd docker/judge0
+docker compose up -d db redis
+sleep 10s
+docker compose up -d
+```
+Finally, start the backend development server
 ```bash
 python run.py
 ```
