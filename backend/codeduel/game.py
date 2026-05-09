@@ -94,6 +94,10 @@ def editor_update_handler(data: str):
 
 @sio.on('submission')
 def submission_handler(data: dict):
+    """Sends submission to the judge and sends the results to the game room. Ends the game when a player passes all test cases.
+
+    :param data: submission source code
+    """
     game = games[session['game_id'].int]
     problem = db.session.get(Problem, game.problem)
     results = [0 for _ in range(len(problem.test_cases))]
