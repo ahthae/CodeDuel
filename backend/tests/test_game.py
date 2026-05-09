@@ -26,6 +26,17 @@ def test_join_existing_game(game):
     assert game.sio_client.get_received()[-1]['name'] == 'start'
     assert game.sio_client2.get_received()[-1]['name'] == 'start'
 
+def test_join_full_game(game, auth, app, client):
+    game_id = game.create_game()
+    with auth.login(username='testadmin', password='testadminpass'):
+        sio_client3 = SocketIOTestClient(app, sio, flask_test_client=client)
+        sio_client3.emit('join', game_id)
+
+        game_id = UUID(game_id).int
+        assert games[game_id].player1 != 2
+        assert games[game_id].player2 != 2
+        assert sio_client3.get_received()[-1]['name'] != 'start'
+
 def test_editor_update(game):
     game_id = game.create_game()
     game.sio_client.emit('editor_update', 'test $editor\n content')
@@ -52,9 +63,32 @@ int main() {
 
     game.sio_client.emit('submission', code)
 
-    # TODO add test case ID, compiler output, and output logs to results
-    # TODO maybe add submission ID
     received = game.sio_client.get_received()[-1]
     assert received['name'] == 'submission'
-    assert received['args'][0][0]['id'] == 3 # Accepted
-    assert received['args'][0][1]['id'] == 4 # Wrong  Answer
+    assert game.sio_client2.get_received()[-1]['name'] == 'submission' # Make sure the other player gets the submission results too
+    assert received['args'][0][0]['status']['id'] == 3 # Accepted
+    assert received['args'][0][1]['status']['id'] == 4 # Wrong  Answer
+
+def test_win(game):
+    game_id = game.create_game()
+    code = r'''#include <iostream>
+using namespace std;
+int main() {
+    string s;
+    cin >> s;
+    cout << "test case output test\n";
+    return 0;
+}'''
+
+    with game.sio_client.app.app_context():
+        games[UUID(game_id).int].problem = 1
+        db.session.commit()
+
+    game.sio_client.emit('submission', code)
+
+    received = game.sio_client.get_received()[-1]
+    received2 = game.sio_client2.get_received()[-1]
+    assert received['name'] == 'end'
+    assert received2['name'] == 'end'
+    assert received['args'][0] == 1 # Player 1 won
+    assert received2['args'][0] == 1 # Player 2 is notified player 1 won

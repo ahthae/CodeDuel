@@ -47,6 +47,12 @@ Sent by client join a game.
 Arguments:
 - id: string - UUID of the game. An empty ID creates a new game instance and joins it.
 
+#### `end`
+Sent by server to signal the end of the game
+
+Arguments:
+- winner: int - User ID of the winner
+
 #### `waiting`
 Broadcast by the server when a game begins waiting for another player to join the game
 
