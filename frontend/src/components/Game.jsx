@@ -30,7 +30,7 @@ export default function Game() {
 	const navigate = useNavigate();
 	const { gameId } = useParams();
 
-	const [socket, setSocket] = useState(io('ws://localhost:5000', {autoConnect: false, withCredentials: true}));
+	const [socket, setSocket] = useState(io(undefined, {autoConnect: false, withCredentials: true}));
 	const [game, setGame] = useState(null);
 
 	const editorRef = useRef(null);
