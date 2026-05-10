@@ -1,10 +1,11 @@
+import requests
 import uuid
 from enum import Enum
 from flask_socketio import ConnectionRefusedError, join_room, SocketIO
 from flask_jwt_extended import verify_jwt_in_request
-from flask import request, session
+from flask import current_app, request, session
 
-from codeduel.models import db, Duel, User
+from codeduel.models import db, Duel, Problem, User
 from codeduel.auth import jwt_lookup_cb
 
 sio = SocketIO(cors_allowed_origins='*')
@@ -16,6 +17,9 @@ class GameState(Enum):
     FINISHED = 2
 
 class GameFullException(Exception):
+    def __init__(self, game_id):
+        self.game_id = game_id
+class GameEndedException(Exception):
     def __init__(self, game_id):
         self.game_id = game_id
 
@@ -31,6 +35,8 @@ class Game(Duel):
         """
         if self.state != GameState.WAITING or self.player2 is not None:
             raise GameFullException(self.id)
+        if self.state == GameState.FINISHED:
+            raise GameEndedException(self.id)
 
         if self.player1 is None:
             self.player1 = user.id
@@ -42,11 +48,9 @@ class Game(Duel):
         
         return self.state
 
-    def end(self):
-        # TODO set winner
-        db.session.add(super)
-        self.model = Duel()
-        sio.emit('end', room=self.id)
+    def end(self, winner):
+        self.status = GameState.FINISHED
+        self.winner = (self.player2 == winner.id)+1
 
 @sio.on('connect')
 def connect_handler(auth: dict) -> None:
@@ -88,9 +92,46 @@ def join_game(id: str = None) -> None:
 def editor_update_handler(data: str):
     sio.emit('editor_update', data, room=session['game_id'].int, skip_sid=request.sid)
 
-@sio.on('submit')
+@sio.on('submission')
 def submission_handler(data: dict):
-    raise NotImplementedError
+    """Sends submission to the judge and sends the results to the game room. Ends the game when a player passes all test cases.
+
+    :param data: submission source code
+    """
+    game = games[session['game_id'].int]
+    problem = db.session.get(Problem, game.problem)
+    results = [0 for _ in range(len(problem.test_cases))]
+    did_pass = True
+    i = 0
+    for test_case in problem.test_cases:
+        r = requests.post(current_app.config['JUDGE_URL']+'/submissions?wait=true', json={ # TODO use callback_url instead of waiting
+            'source_code': data,
+            'language_id': 54, # C++ GCC (see 'GET /languages' for the Judge0 langauge IDs)
+            'stdin': test_case.input,
+            'expected_output': test_case.output
+        })
+        j = r.json()
+        if j['status']['id'] != 3:
+            did_pass = False
+        results[i] = {
+            'user_id': session['user'].id,
+            'source_code': j['source_code'],
+            'status': j['status'],
+            'stdout': j['stdout'],
+            'stderr': j['stderr'],
+            'compile_output': j['compile_output'],
+            'message': j['message'],
+            'time': j['time'],
+            'memory': j['memory'],
+            'token': j['token'],
+            'test_case_id': test_case.id
+        }
+        i += 1
+    sio.emit('submission', results, room=game.id.int)
+    if did_pass:
+        game.end(session['user'])
+        db.session.commit()
+        sio.emit('end', session['user'].id, room=game.id.int)
 
 @sio.on('queue')
 def queue_game_handler():

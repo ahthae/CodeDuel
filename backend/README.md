@@ -1,13 +1,25 @@
 # CodeDuel
 
 ## Running
+First, make sure to pull submodules
+`git clone git@github.com:ahthae/CodeDuel.git --recursive`
+
 Copy the example `config.json` into the Flask instance folder
 ```bash
 cd backend
 mkdir instance
 cp instance/example_config.json instance/config.json
 ```
-then, start the backend development server with
+and put set passwords for REDIS_PASSWORD and POSTGRES_PASSWORD in docker/judge0/judge0.conf
+
+Then, start the Judge0 server
+```bash
+cd docker/judge0
+docker compose up -d db redis
+sleep 10s
+docker compose up -d
+```
+Finally, start the backend development server
 ```bash
 python run.py
 ```
@@ -33,13 +45,19 @@ Socket.IO connection event. auth argmuents are ignored and the session is authet
 Sent by client join a game. 
 
 Arguments:
-- id - UUID string of the game. An empty ID creates a new game instance and joins it.
+- id: string - UUID of the game. An empty ID creates a new game instance and joins it.
+
+#### `end`
+Sent by server to signal the end of the game
+
+Arguments:
+- winner: int - User ID of the winner
 
 #### `waiting`
 Broadcast by the server when a game begins waiting for another player to join the game
 
 Arguments:
-- id - UUID string of the open game.
+- id: string - UUID of the open game.
 
 #### `start`
 Emitted by the server to the game room when the game has begun.
@@ -49,7 +67,15 @@ Sent by client when their editor content has changed.
 Re-broadcast by server to the game room so the other player's client can update.
 
 Arguments:
-- content - string containing the new editor content. Represents the entire content, not just a diff.
+- content: string - The updated editor content. Represents the entire content, not just a diff.
+
+#### `submission`
+Sent by client to submit an answer.
+Sent back to client by server with results.
+
+Arguments:
+- code: string - Client only. Source code of the submission.
+- test_cases: dict[] - Server only. Array of results for each test case. ex:`[{ 'description': 'Accepted', 'id': 3 }]`
 
 ## Credits
 Example problem data taken from Competitive Coding Club at UC Riverside with permission.
