@@ -115,6 +115,7 @@ def submission_handler(data: dict):
             did_pass = False
         results[i] = {
             'user_id': session['user'].id,
+            'source_code': j['source_code'],
             'status': j['status'],
             'stdout': j['stdout'],
             'stderr': j['stderr'],
