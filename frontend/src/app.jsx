@@ -4,6 +4,7 @@ import LoginPage from "./LoginPage";
 import RegisterPage from "./RegisterPage";
 import Game from "./components/Game";
 import Dashboard from "./Dashboard";
+import '@/index.css'
 
 export default function App() {
   return (

@@ -2,9 +2,10 @@ import Cookies from 'js-cookie';
 import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@monaco-editor/react';
 import { io } from 'socket.io-client';
-import styles from "./Game.module.css";
-import GameInfo from './GameInfo';
 import { useNavigate, useParams } from 'react-router-dom';
+import GameInfo from '@/components/GameInfo';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import styles from "./Game.module.css";
 
 const default_editor_text = `#include <iostream>
 
@@ -146,36 +147,44 @@ export default function Game() {
 	}
 
 return (
-  <div className={styles.gameContainer}>
+	<ResizablePanelGroup className="min-h-screen">
+		{/* <ResizablePanel className={styles.leftPanel}> */}
+		<ResizablePanel>
+			<ResizablePanelGroup orientation="vertical">
+			<ResizablePanel defaultSize="66%">
+				<GameInfo problem={problem} onSubmit={handleSubmit}/>
+			</ResizablePanel>
 
-    <div className={styles.leftPanel}>
-		<GameInfo problem={problem} onSubmit={handleSubmit}/>
+			<ResizableHandle />
 
-      <Editor
-	  	ref={opponentEditorRef}
-        className={styles.Editor}
-        onMount={handleOpponentEditorMount}
-        defaultValue={sessionStorage.getItem("opponent_editor_content") ?? default_opponent_editor_text}
-        defaultLanguage="cpp"
-		theme="vs-dark"
-        options={{ readOnly: true }}
-      />
-    </div>
+			<ResizablePanel>
+				<Editor
+					ref={opponentEditorRef}
+					// className={styles.Editor}
+					onMount={handleOpponentEditorMount}
+					defaultValue={sessionStorage.getItem("opponent_editor_content") ?? default_opponent_editor_text}
+					defaultLanguage="cpp"
+					theme="vs-dark"
+					options={{ readOnly: true }}
+				/>
+			</ResizablePanel>
+			</ResizablePanelGroup>
+		</ResizablePanel>
 
-    <div className={styles.rightPanel}>
+		<ResizableHandle />
 
-      <Editor
-	  	ref={editorRef}
-        className={styles.Editor}
-        onMount={handleEditorMount}
-        defaultValue={sessionStorage.getItem("editor_content") ?? default_editor_text}
-        defaultLanguage="cpp"
-		theme="vs-dark"
-        options={{ readOnly: false }}
-        onChange={handleEditorChange}
-      />
-    </div>
-
-  </div>
+		<ResizablePanel defaultSize="66%" className={styles.rightPanel}>
+			<Editor
+				ref={editorRef}
+				// className={styles.Editor}
+				onMount={handleEditorMount}
+				defaultValue={sessionStorage.getItem("editor_content") ?? default_editor_text}
+				defaultLanguage="cpp"
+				theme="vs-dark"
+				options={{ readOnly: false }}
+				onChange={handleEditorChange}
+			/>
+		</ResizablePanel>
+	</ResizablePanelGroup>
 );
 }
