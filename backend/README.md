@@ -41,6 +41,12 @@ In-game communication happens over Socket.IO. The server creates a room for each
 #### `connect`
 Socket.IO connection event. auth argmuents are ignored and the session is autheticated with the HTTP request's JWT.
 
+#### `error`
+
+Arguments:
+- error_code: int - 1 indicates the game could not be found, 2 indicates the game is full, 3 indicates the game has ended
+- game_id?: UUID string
+
 #### `join`
 Sent by client join a game. 
 

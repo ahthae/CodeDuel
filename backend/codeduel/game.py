@@ -4,6 +4,7 @@ from enum import Enum
 from flask_socketio import ConnectionRefusedError, join_room, SocketIO
 from flask_jwt_extended import verify_jwt_in_request
 from flask import current_app, request, session
+from random import randint
 
 from codeduel.models import db, Duel, Problem, User
 from codeduel.auth import jwt_lookup_cb
@@ -67,18 +68,26 @@ def join_game(id: str = None) -> None:
     if id is not None:
         id = uuid.UUID(id)
         if id.int not in games:
-            sio.emit('error', 'Game ID not found.', to=request.sid)
+            sio.emit('error', {'error_code': 1, 'description': 'game not found','game_id': str(id)}, to=request.sid)
             return
+
+        game = games[id.int]
+        user = session['user']
         try:
-            games[id.int].join(session['user'])
-            db.session.commit()
+            if game.player1 != user.id and game.player2 != user.id:
+                game.join(session['user'])
+                db.session.commit()
+                sio.emit('start', room=id.int)
             join_room(id.int)
-            sio.emit('start', room=id.int)
+            session['game_id'] = game.id
         except GameFullException:
-            sio.emit('error', 'Game not joinable.', to=request.sid)
+            sio.emit('error', {'error_code': 2, 'description': 'game full', 'game_id':str(id)}, to=request.sid)
+        except GameEndedException:
+            sio.emit('error', {'error_code': 3, 'description': 'game ended', 'game_id': str(id)}, to=request.sid)
     else:
         # Create a new game instance
         game = Game()
+        game.problem = choose_problem()
         game.join(session['user'])
         db.session.add(game)
         db.session.commit()
@@ -150,3 +159,8 @@ def authenticate_client() -> int:
     except:
         raise ConnectionRefusedError('Connection refused by server: invalid token.')
     return jwt_lookup_cb(jwt_header, jwt_data)
+
+def choose_problem() -> int:
+    """Returns the ID of a random problem from the database."""
+    problems = db.session.scalars(db.select(Problem.id)).all()
+    return problems[randint(0, len(problems)-1)]

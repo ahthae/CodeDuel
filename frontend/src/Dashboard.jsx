@@ -11,6 +11,9 @@ export default function Dashboard() {
   };
 
   const handleCreateRoom = () => {
+    sessionStorage.removeItem("game_id");
+    sessionStorage.removeItem("editor_content");
+    sessionStorage.removeItem("opponent_editor_content");
     navigate("/game");
   };
 
