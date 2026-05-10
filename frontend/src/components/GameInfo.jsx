@@ -3,26 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { MathJax } from "better-react-mathjax";
 import styles from "./Game.module.css";
 
-export default function GameInfo({problemId, onSubmit}) {
-    const [problem, setProblem] = useState(null);
+export default function GameInfo({problem, onSubmit}) {
     const descriptionRef = useRef();
-
-    useEffect(()=>{
-        const fetchProblem = async () => {
-            const result = await (await fetch(`/api/problem/${problemId}`, {
-                headers: { 'X-CSRF-Token': Cookies.get("csrf_access_token") },
-                credentials: 'include'
-            })).json();
-
-            if (!ignore) {
-                setProblem(result);
-            }
-        };
-
-        let ignore = false;
-        if (problemId) { fetchProblem(); }
-        return () => { ignore = true; }
-    }, [problemId]);
 
     const handleSubmit = () => {
         onSubmit();

@@ -32,6 +32,7 @@ export default function Game() {
 
 	const [socket, setSocket] = useState(io(undefined, {autoConnect: false, withCredentials: true}));
 	const [game, setGame] = useState(null);
+    const [problem, setProblem] = useState(null);
 
 	const editorRef = useRef(null);
 	const opponentEditorRef = useRef(null);
@@ -86,6 +87,9 @@ export default function Game() {
 			updateOpponentEditor(content);
 		});
 		socket.on("submission", (results) => {
+			for (const result of results) {
+				console.log(`${result.test_case_id}: ${result.status.description}`);
+			}
 			// TODO
 		});
 
@@ -106,6 +110,17 @@ export default function Game() {
 	}, [socket]);
 
 	useEffect(()=>{
+        const fetchProblem = async problemId => {
+            const result = await (await fetch(`/api/problem/${problemId}`, {
+                headers: { 'X-CSRF-Token': Cookies.get("csrf_access_token") },
+                credentials: 'include'
+            })).json();
+
+            if (!ignore) {
+                setProblem(result);
+            }
+        };
+
 		const fetchGame = async () => {
 			const result = await (await fetch(`/api/duel/${gameId}`, {
                 headers: { 'X-CSRF-Token': Cookies.get("csrf_access_token") },
@@ -113,6 +128,7 @@ export default function Game() {
 			})).json();
 			if (!ignore) {
 				setGame(result);
+				await fetchProblem(result.problem);
 			}
 		};
 
@@ -152,7 +168,7 @@ return (
   <div className={styles.gameContainer}>
 
     <div className={styles.leftPanel}>
-		<GameInfo problemId={game?.problem} onSubmit={handleSubmit}/>
+		<GameInfo problem={problem} onSubmit={handleSubmit}/>
 
       <Editor
 	  	ref={opponentEditorRef}
