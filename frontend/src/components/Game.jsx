@@ -69,23 +69,41 @@ export default function Game() {
 		opponentEditorRef.current.setValue(value)
 	};
 
-	return (
-	<>
-		<Editor className={styles.Editor}
-				defaultValue={default_editor_text}
-				defaultLanguage="cpp"
-				options={{readOnly: false}}
-				onChange={(value, ev) => { 
-					socket.emit("editor_update", value);
-					console.log("Emitted editor update");
-					}}
-		/>
-		<Editor className={styles.Editor}
-				onMount={handleOpponentEditorMount}
-				defaultValue={default_opponent_editor_text}
-				defaultLanguage="cpp"
-				options={{readOnly: true}}
-		/>
-	</>
-	)
+return (
+  <div className={styles.gameContainer}>
+
+    <div className={styles.leftPanel}>
+
+      <div className={styles.problemPanel}>
+      </div>
+
+      <div className={styles.opponentPanel}></div>
+
+      <Editor
+        className={styles.Editor}
+        defaultValue={default_editor_text}
+        defaultLanguage="cpp"
+		theme="vs-dark"
+        options={{ readOnly: false }}
+        onChange={(value, ev) => { 
+          socket.emit("editor_update", value);
+          console.log("Emitted editor update");
+        }}
+      />
+
+    </div>
+
+    <div className={styles.rightPanel}>
+      <Editor
+        className={styles.Editor}
+        onMount={handleOpponentEditorMount}
+        defaultValue={default_opponent_editor_text}
+        defaultLanguage="cpp"
+		theme="vs-dark"
+        options={{ readOnly: true }}
+      />
+    </div>
+
+  </div>
+);
 }

@@ -28,7 +28,7 @@ export default function LoginPage() {
       const data = await response.json();
 
     if (response.ok) {
-      navigate("/lobby");
+      navigate("/dashboard");
     } else {
       alert(data.message || "Request failed");
     }
