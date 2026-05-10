@@ -83,7 +83,7 @@ def join_game(id: str = None) -> None:
                 print(f'Player {user.username} rejoining {str(game.id)}')
             join_room(id.int)
             session['game_id'] = game.id
-            sio.emit('join', { 'game_id': str(game.id), 'user_id': user.id }, to=request.sid)
+            sio.emit('join', { 'game_id': str(game.id), 'user_id': user.id }, room=game.id.int)
         except GameFullException:
             sio.emit('error', {'error_code': 2, 'description': 'game full', 'game_id':str(id)}, to=request.sid)
         except GameEndedException:
@@ -99,7 +99,7 @@ def join_game(id: str = None) -> None:
         games[game.id.int] = game
         join_room(game.id.int)
         session['game_id'] = game.id
-        sio.emit('join', { 'game_id': str(game.id), 'user_id': user.id }, to=request.sid)
+        sio.emit('join', { 'game_id': str(game.id), 'user_id': user.id }, room=game.id.int)
         sio.emit('waiting', str(game.id))
 
 @sio.on('editor_update')

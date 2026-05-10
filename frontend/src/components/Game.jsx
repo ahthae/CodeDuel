@@ -38,6 +38,7 @@ export default function Game() {
 	useEffect(() => {
 		socket.on("connect_error", (err) => {
 			console.log(`Socket ${err.name}: ${err.message}`);
+			// TODO display error message
 			navigate('/dashboard');
 		});
 		socket.on("error", (args) => {
@@ -65,7 +66,7 @@ export default function Game() {
 			if (data.user_id == Cookies.get("user_id")) {
 				navigate("/game/"+data.game_id, { replace: true });
 			} else {
-				socket.emit("editor_update", editorRef.value);
+				socket.emit("editor_update", editorRef.current.getValue());
 			}
 		});
 		// TODO game waiting list?
@@ -78,8 +79,7 @@ export default function Game() {
 			sessionStorage.removeItem("editor_content");
 			sessionStorage.removeItem("opponent_editor_content");
 			// TODO
-			// game results screen?
-			// navigate
+			// game results screen or navigate?
 		});
 		socket.on("editor_update", (content) => {
 			updateOpponentEditor(content);
@@ -119,6 +119,7 @@ export default function Game() {
 	};
 
 	const updateOpponentEditor = (value) => {
+		sessionStorage.setItem("opponent_editor_content", value);
 		opponentEditorRef.current.setValue(value)
 	};
 

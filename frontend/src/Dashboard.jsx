@@ -11,14 +11,13 @@ export default function Dashboard() {
   };
 
   const handleCreateRoom = () => {
-    sessionStorage.removeItem("game_id");
     sessionStorage.removeItem("editor_content");
     sessionStorage.removeItem("opponent_editor_content");
     navigate("/game");
   };
 
   const handleJoinRoom = () => {
-    navigate("/game");
+    navigate("/game/"+roomCode);
   };
 
   return (
