@@ -77,11 +77,14 @@ def join_game(id: str = None) -> None:
             if game.player1 != user.id and game.player2 != user.id:
                 print(f'Adding player {user.username} to {str(game.id)}')
                 game.join(session['user'])
+                game.problem = choose_problem()
                 db.session.commit()
-                sio.emit('start', room=id.int)
+                join_room(id.int)
+                sio.emit('start', game.problem, room=id.int)
             else:
                 print(f'Player {user.username} rejoining {str(game.id)}')
-            join_room(id.int)
+                join_room(id.int)
+                sio.emit('start', game.problem, to=request.sid)
             session['game_id'] = game.id
             sio.emit('join', { 'game_id': str(game.id), 'user_id': user.id }, room=game.id.int)
         except GameFullException:
@@ -91,7 +94,6 @@ def join_game(id: str = None) -> None:
     else:
         # Create a new game instance
         game = Game()
-        game.problem = choose_problem()
         game.join(session['user'])
         db.session.add(game)
         db.session.commit()

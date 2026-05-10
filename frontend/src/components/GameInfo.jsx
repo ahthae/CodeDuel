@@ -1,5 +1,4 @@
-import Cookies from "js-cookie";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { MathJax } from "better-react-mathjax";
 import styles from "./Game.module.css";
 

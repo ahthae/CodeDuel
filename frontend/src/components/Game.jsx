@@ -31,7 +31,6 @@ export default function Game() {
 	const { gameId } = useParams();
 
 	const [socket, setSocket] = useState(io(undefined, {autoConnect: false, withCredentials: true}));
-	const [game, setGame] = useState(null);
     const [problem, setProblem] = useState(null);
 
 	const editorRef = useRef(null);
@@ -71,11 +70,9 @@ export default function Game() {
 				socket.emit("editor_update", editorRef.current.getValue());
 			}
 		});
-		// TODO game waiting list?
-		// might need to move socket connection logic out of this component
-		// socket.on("waiting", (game_id) => {
-		// 	sessionStorage.setItem("game_id", game_id);
-		// });
+		socket.on("start", async problemId => {
+			await updateProblem(problemId);
+		});
 		socket.on("end", (winner) => {
 			sessionStorage.removeItem("game_id");
 			sessionStorage.removeItem("editor_content");
@@ -100,6 +97,7 @@ export default function Game() {
 			socket.off("connect")
 			socket.off("error")
 			socket.off("waiting")
+			socket.off("start")
 			socket.off("end")
 			socket.off("join")
 			socket.off("editor_update")
@@ -109,33 +107,16 @@ export default function Game() {
 		};
 	}, [socket]);
 
-	useEffect(()=>{
-        const fetchProblem = async problemId => {
-            const result = await (await fetch(`/api/problem/${problemId}`, {
-                headers: { 'X-CSRF-Token': Cookies.get("csrf_access_token") },
-                credentials: 'include'
-            })).json();
+	const fetchProblem = async problemId => {
+		return await (await fetch(`/api/problem/${problemId}`, {
+			headers: { 'X-CSRF-Token': Cookies.get("csrf_access_token") },
+			credentials: 'include'
+		})).json();
+	};
 
-            if (!ignore) {
-                setProblem(result);
-            }
-        };
-
-		const fetchGame = async () => {
-			const result = await (await fetch(`/api/duel/${gameId}`, {
-                headers: { 'X-CSRF-Token': Cookies.get("csrf_access_token") },
-                credentials: 'include'
-			})).json();
-			if (!ignore) {
-				setGame(result);
-				await fetchProblem(result.problem);
-			}
-		};
-
-		let ignore = false;
-		if (gameId) fetchGame();
-		return ()=>{ ignore = true; };
-	}, [gameId]);
+	const updateProblem = async problemId => {
+		setProblem(await fetchProblem(problemId));
+	}
 
 	const createGame = () => { 
 		socket.emit("join");
@@ -157,7 +138,7 @@ export default function Game() {
 
 	const updateOpponentEditor = (value) => {
 		sessionStorage.setItem("opponent_editor_content", value);
-		opponentEditorRef.current.setValue(value)
+		opponentEditorRef?.current?.setValue(value)
 	};
 
 	const handleSubmit = () => {
