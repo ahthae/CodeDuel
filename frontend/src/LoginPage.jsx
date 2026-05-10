@@ -1,4 +1,3 @@
-import Cookies from "js-cookie";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Auth.css";
@@ -16,9 +15,7 @@ export default function LoginPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // "X-CSRF-Token": Cookies.get('csrf_access_token') // needed for JWT dobule submit
         },
-        credentials: "include", // important for JWT cookies
         body: JSON.stringify({
           username: username,
           password: password,
