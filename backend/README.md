@@ -48,11 +48,12 @@ Arguments:
 - game_id?: UUID string
 
 #### `join`
-Sent by client join a game. 
-Sent back to client by server to indicate the client has joined the game.
+Sent by client to join a game. 
+Sent to the game room by server to indicate a client has joined the game.
 
 Arguments:
 - id: string - UUID of the game. An empty ID creates a new game instance and joins it.
+- user_id: int - Server only. ID of the user who joined the game.
 
 #### `end`
 Sent by server to signal the end of the game

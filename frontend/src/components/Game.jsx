@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie';
 import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@monaco-editor/react';
 import { io } from 'socket.io-client';
@@ -30,7 +31,6 @@ export default function Game() {
 	const { gameId } = useParams();
 
 	const [socket, setSocket] = useState(io('ws://localhost:5000', {autoConnect: false, withCredentials: true}));
-	const [socket2, setSocket2] = useState(io('ws://localhost:5000', {autoConnect: false, withCredentials: true})); // Mock opponent for testing
 
 	const editorRef = useRef(null);
 	const opponentEditorRef = useRef(null);
@@ -61,9 +61,12 @@ export default function Game() {
 				createGame();
 			}
 		});
-		socket.on("join", (gameId) => {
-			navigate("/game/"+gameId, { replace: true });
-			socket2.emit('join', gameId);
+		socket.on("join", (data) => {
+			if (data.user_id == Cookies.get("user_id")) {
+				navigate("/game/"+data.game_id, { replace: true });
+			} else {
+				socket.emit("editor_update", editorRef.value);
+			}
 		});
 		// TODO game waiting list?
 		// might need to move socket connection logic out of this component
@@ -78,23 +81,11 @@ export default function Game() {
 			// game results screen?
 			// navigate
 		});
-
-		socket2.on("connect", () => {
-			if (gameId) {
-				console.log("Opponent joining game "+gameId);
-				socket2.emit('join', gameId);
-			}
-		});
-		socket2.on("connect_error", (err) => {
-			console.log(`Socket 2 ${err.name}: ${err.message}`)
-		});
-		socket2.on("editor_update", (content) => {
-			sessionStorage.setItem("opponent_editor_content", content);
+		socket.on("editor_update", (content) => {
 			updateOpponentEditor(content);
 		});
 
 		socket.connect();
-		socket2.connect();
 
 		return () => {
 			socket.off("connect_error")
@@ -103,12 +94,8 @@ export default function Game() {
 			socket.off("waiting")
 			socket.off("end")
 			socket.off("join")
-			socket2.off("connect_error")
-			socket2.off("connect")
-			socket2.off("waiting");
-			socket2.off("editor_update");
+			socket.off("editor_update")
 			socket.disconnect()
-			socket2.disconnect()
 			console.log("Socket disconnected.");
 		};
 	}, []);

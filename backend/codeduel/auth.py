@@ -24,6 +24,7 @@ def login():
     response = jsonify({'message':'Login successful.'})
     access_token = create_access_token(identity=user)
     set_access_cookies(response, access_token)
+    response.set_cookie('user_id', f'{user.id}')
 
     return response
 
@@ -32,6 +33,7 @@ def login():
 def logout():
     response = jsonify({'message':'Logout successful.'})
     unset_jwt_cookies(response)
+    response.set_cookie('user_id', '', expires=0)
     return response
 
 @bp.post('/register')

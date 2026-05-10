@@ -65,6 +65,7 @@ def join_game(id: str = None) -> None:
 
     :param id: Game UUID as 128-bit string
     """
+    user = session['user']
     if id is not None:
         id = uuid.UUID(id)
         if id.int not in games:
@@ -72,10 +73,9 @@ def join_game(id: str = None) -> None:
             return
 
         game = games[id.int]
-        user = session['user']
         try:
             if game.player1 != user.id and game.player2 != user.id:
-                print(f'Adding player {user.name} to {str(game.id)}')
+                print(f'Adding player {user.username} to {str(game.id)}')
                 game.join(session['user'])
                 db.session.commit()
                 sio.emit('start', room=id.int)
@@ -83,6 +83,7 @@ def join_game(id: str = None) -> None:
                 print(f'Player {user.username} rejoining {str(game.id)}')
             join_room(id.int)
             session['game_id'] = game.id
+            sio.emit('join', { 'game_id': str(game.id), 'user_id': user.id }, to=request.sid)
         except GameFullException:
             sio.emit('error', {'error_code': 2, 'description': 'game full', 'game_id':str(id)}, to=request.sid)
         except GameEndedException:
@@ -98,7 +99,7 @@ def join_game(id: str = None) -> None:
         games[game.id.int] = game
         join_room(game.id.int)
         session['game_id'] = game.id
-        sio.emit('join', str(game.id), to=request.sid)
+        sio.emit('join', { 'game_id': str(game.id), 'user_id': user.id }, to=request.sid)
         sio.emit('waiting', str(game.id))
 
 @sio.on('editor_update')
