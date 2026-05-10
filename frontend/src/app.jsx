@@ -13,7 +13,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/game" element={<Game/>} />
+        <Route path="/game/:gameId?" element={<Game/>} />
 
       </Routes>
     </BrowserRouter>

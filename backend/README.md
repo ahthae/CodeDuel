@@ -49,6 +49,7 @@ Arguments:
 
 #### `join`
 Sent by client join a game. 
+Sent back to client by server to indicate the client has joined the game.
 
 Arguments:
 - id: string - UUID of the game. An empty ID creates a new game instance and joins it.

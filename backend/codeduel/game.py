@@ -75,9 +75,12 @@ def join_game(id: str = None) -> None:
         user = session['user']
         try:
             if game.player1 != user.id and game.player2 != user.id:
+                print(f'Adding player {user.name} to {str(game.id)}')
                 game.join(session['user'])
                 db.session.commit()
                 sio.emit('start', room=id.int)
+            else:
+                print(f'Player {user.username} rejoining {str(game.id)}')
             join_room(id.int)
             session['game_id'] = game.id
         except GameFullException:
@@ -95,6 +98,7 @@ def join_game(id: str = None) -> None:
         games[game.id.int] = game
         join_room(game.id.int)
         session['game_id'] = game.id
+        sio.emit('join', str(game.id), to=request.sid)
         sio.emit('waiting', str(game.id))
 
 @sio.on('editor_update')
