@@ -31,6 +31,7 @@ export default function Game() {
 	const { gameId } = useParams();
 
 	const [socket, setSocket] = useState(io('ws://localhost:5000', {autoConnect: false, withCredentials: true}));
+	const [game, setGame] = useState(null);
 
 	const editorRef = useRef(null);
 	const opponentEditorRef = useRef(null);
@@ -84,6 +85,9 @@ export default function Game() {
 		socket.on("editor_update", (content) => {
 			updateOpponentEditor(content);
 		});
+		socket.on("submission", (results) => {
+			// TODO
+		});
 
 		socket.connect();
 
@@ -95,10 +99,27 @@ export default function Game() {
 			socket.off("end")
 			socket.off("join")
 			socket.off("editor_update")
+			socket.off("submission")
 			socket.disconnect()
 			console.log("Socket disconnected.");
 		};
-	}, []);
+	}, [socket]);
+
+	useEffect(()=>{
+		const fetchGame = async () => {
+			const result = await (await fetch(`/api/duel/${gameId}`, {
+                headers: { 'X-CSRF-Token': Cookies.get("csrf_access_token") },
+                credentials: 'include'
+			})).json();
+			if (!ignore) {
+				setGame(result);
+			}
+		};
+
+		let ignore = false;
+		if (gameId) fetchGame();
+		return ()=>{ ignore = true; };
+	}, [gameId]);
 
 	const createGame = () => { 
 		socket.emit("join");
@@ -123,11 +144,15 @@ export default function Game() {
 		opponentEditorRef.current.setValue(value)
 	};
 
+	const handleSubmit = () => {
+		socket.emit("submission", editorRef.current.getValue());
+	}
+
 return (
   <div className={styles.gameContainer}>
 
     <div className={styles.leftPanel}>
-		<GameInfo onJoinGame={()=>{}}/>
+		<GameInfo problemId={game?.problem} onSubmit={handleSubmit}/>
 
       <Editor
 	  	ref={opponentEditorRef}
