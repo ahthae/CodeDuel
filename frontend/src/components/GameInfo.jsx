@@ -1,5 +1,6 @@
 import Cookies from "js-cookie";
 import { useEffect, useRef, useState } from "react";
+import { MathJax } from "better-react-mathjax";
 import styles from "./Game.module.css";
 
 export default function GameInfo({problemId, onSubmit}) {
@@ -32,10 +33,12 @@ export default function GameInfo({problemId, onSubmit}) {
     <button type="button" onClick={handleSubmit}>Submit</button>
     <div className={styles.problemPanel}>
         <h1>{problem?.name}</h1>
-        <div ref={descriptionRef} dangerouslySetInnerHTML={{ __html: problem?.description }}></div>
+        <MathJax inline>
+            <div ref={descriptionRef} dangerouslySetInnerHTML={{__html: problem?.description}}></div>
+        </MathJax>
     </div>
 
-    <div className={styles.opponentPanel}></div>
+    {/* <div className={styles.opponentPanel}></div> */}
 </>
     )
 }
