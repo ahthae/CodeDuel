@@ -68,7 +68,7 @@ export default function Game() {
 			if (data.user_id == Cookies.get("user_id")) {
 				navigate("/game/"+data.game_id, { replace: true });
 			} else {
-				socket.emit("editor_update", editorRef.current.getValue());
+				socket.emit("editor_update", editorRef?.current.getValue());
 			}
 		});
 		socket.on("start", async problemId => {
@@ -87,6 +87,9 @@ export default function Game() {
 		socket.on("submission", (results) => {
 			for (const result of results) {
 				console.log(`${result.test_case_id}: ${result.status.description}`);
+				if (result.compile_output) {
+					console.log(atob(result.compile_output));
+				}
 			}
 			// TODO
 		});
@@ -143,7 +146,7 @@ export default function Game() {
 	};
 
 	const handleSubmit = () => {
-		socket.emit("submission", editorRef.current.getValue());
+		socket.emit("submission", btoa(editorRef.current.getValue()));
 	}
 
 return (

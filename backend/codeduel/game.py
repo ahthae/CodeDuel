@@ -1,5 +1,6 @@
 import requests
 import uuid
+from base64 import b64encode
 from enum import Enum
 from flask_socketio import ConnectionRefusedError, join_room, SocketIO
 from flask_jwt_extended import verify_jwt_in_request
@@ -120,11 +121,11 @@ def submission_handler(data: dict):
     did_pass = True
     i = 0
     for test_case in problem.test_cases:
-        r = requests.post(current_app.config['JUDGE_URL']+'/submissions?wait=true', json={ # TODO use callback_url instead of waiting
+        r = requests.post(current_app.config['JUDGE_URL']+'/submissions?base64_encoded=true&wait=true', json={ # TODO use callback_url instead of waiting
             'source_code': data,
             'language_id': 54, # C++ GCC (see 'GET /languages' for the Judge0 langauge IDs)
-            'stdin': test_case.input,
-            'expected_output': test_case.output
+            'stdin': b64encode(test_case.input.encode()).decode(),
+            'expected_output': b64encode(test_case.output.encode()).decode()
         })
         j = r.json()
         if j['status']['id'] != 3:
