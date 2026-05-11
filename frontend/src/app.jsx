@@ -6,6 +6,7 @@ import Game from "./components/Game";
 import Dashboard from "./Dashboard";
 import HistoryPage from "./HistoryPage";
 import '@/index.css'
+import Lobby from "./components/Lobby";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/game/:gameId?" element={<Game/>} />
 		<Route path="/history" element={<HistoryPage/>} />
+		<Route path="/lobby" element={<Lobby/>} />
       </Routes>
     </BrowserRouter>
   );
