@@ -7,6 +7,8 @@ export default function HistoryPage() {
 	const [duels, setDuels] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const [users, setUsers] = useState({});
+	const [problems, setProblems] = useState({});
 
 	const userId = Cookies.get("user_id");
 
@@ -16,14 +18,31 @@ export default function HistoryPage() {
 			return;
 		}
 
-	fetch('/api/duel/?player=${userId}', { credentials: "include" })
+	fetch(`/api/duel/?player=${userId}`, { credentials: "include" })
 	.then((res) => {
-		if (!res.ok) throw new Error('Server returned ${res.status}');
+		if (!res.ok) throw new Error(`Server returned ${res.status}`);
 		return res.json();
 	})
 	.then((data) => {
 		setDuels(data);
 		setLoading(false);
+
+		const opponentIds = [...new Set(data.flatMap((d) => [d.player1, d.player2]).filter((id) => id !== id && id !== null)
+		)];
+		const problemIds = [...new Set(data.map((d) => d.problem).filter(Boolean)
+		)];
+
+		Promise.all(opponentIds.map((id) => 
+			fetch(`/api/user/${id}`, {credentials: "include" })
+			.then((r) => r.json())
+			.then((u) => [id, u.username])
+		)).then((pairs) => setUsers(Object.fromEntries(pairs)));
+
+		Promise.all(problemIds.map((id) =>
+			fetch(`/api/problem/${id}`, { credentials: "include" })
+			.then((r) => r.json())
+			.then((p) => [id, p.name])
+		)).then((pairs) => setProblems(Object.fromEntries(pairs)));
 	})
 	.catch((err) => {
 		setError(err.message);
@@ -48,7 +67,7 @@ export default function HistoryPage() {
 		<div style={{ padding: 40, color: "white"}}>
 			<h1>My History</h1>
 			<button onClick={() => navigate("/dashboard")}>Back</button>
-			<div style={{ marginTop: 30, display: "flex, gap:30 "}}>
+			<div style={{ marginTop: 30, display: "flex", gap:30 }}>
 				<div><h2>{gamesPlayed}</h2><p>Games Played</p></div>
 				<div><h2>{wins}</h2><p>Wins</p></div>
 				<div><h2>{losses}</h2><p>Losses</p></div>
@@ -67,7 +86,7 @@ export default function HistoryPage() {
 					{completed.map((d) => {
 						const isPlayer1 = d.player1 === id;
 						const opponentId = isPlayer1 ? d.player2 : d.player1;
-						const won = (isPlayer1 && d.winner == 1) || (!isPlayer1 && d.winner === 2);
+						const won = (isPlayer1 && d.winner === 1) || (!isPlayer1 && d.winner === 2);
 						return (
 							<tr key={d.id} style={{ borderBottom: "1px solid #1e293b"}}>
 								<td style={{ padding:10 }}>Player #{opponentId}</td>
