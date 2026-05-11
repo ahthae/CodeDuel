@@ -34,14 +34,26 @@ export default function HistoryPage() {
 	if (loading) return <div style={{ padding: 40, color: "white" }}>Loading</div>;
 	if (error) return <div style={{ padding: 40, color: "white" }}>Error: {error}</div>;
 
+	const id = parseInt(userId);
+	const completed = duels.filter((d) => d.winner !== null);
+	const gamesPlayed = completed.length;
+	const wins = completed.filter((d) => {
+		const isPlayer1 = d.player === id;
+		return (isPlayer1 && d.winner === 1) || (!isPlayer1 && d.winner === 2);
+	}).length;
+	const losses = gamesPlayed - wins;
+	const winRatio = gamesPlayed > 0 ? Math.round((wins / gamesPlayed) * 100) : 0;
+
 	return (
 		<div style={{ padding: 40, color: "white"}}>
 			<h1>My History</h1>
 			<button onClick={() => navigate("/dashboard")}>Back</button>
-			<p>Total duels: {duels.length}</p>
-			<pre style={{ marginTop: 20, fontSize: 12 }}>
-				{JSON.stringify(duels, null, 2)}
-			</pre>
+			<div style={{ marginTop: 30, display: "flex, gap:30 "}}>
+				<div><h2>{gamesPlayed}</h2><p>Games Played</p></div>
+				<div><h2>{wins}</h2><p>Wins</p></div>
+				<div><h2>{losses}</h2><p>Losses</p></div>
+				<div><h2>{winRatio}%</h2><p>Win Rate</p></div>
+			</div>
 			
 		</div>
 	);
