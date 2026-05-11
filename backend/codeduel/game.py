@@ -68,7 +68,11 @@ def join_game(id: str = None) -> None:
     """
     user = session['user']
     if id is not None:
-        id = uuid.UUID(id)
+        try:
+            id = uuid.UUID(id)
+        except:
+            sio.emit('error', {'error_code': 1, 'description': 'malformed ID'}, to=request.sid)
+            return
         if id.int not in games:
             sio.emit('error', {'error_code': 1, 'description': 'game not found','game_id': str(id)}, to=request.sid)
             return

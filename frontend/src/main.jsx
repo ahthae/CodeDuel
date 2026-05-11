@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './app.jsx'
 import { MathJaxContext } from 'better-react-mathjax'
+import { Toaster } from '@/components/ui/sonner';
 
 const config = {
   loader: { load: ["[tex]/html"] },
@@ -22,6 +23,7 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
   <MathJaxContext config={config}>
     <App />
+    <Toaster />
   </MathJaxContext>
   </StrictMode>,
 )

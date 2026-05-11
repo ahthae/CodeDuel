@@ -2,6 +2,7 @@ import Cookies from 'js-cookie';
 import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@monaco-editor/react';
 import { io } from 'socket.io-client';
+import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 import GameInfo from '@/components/GameInfo';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
@@ -40,7 +41,7 @@ export default function Game() {
 	useEffect(() => {
 		socket.on("connect_error", (err) => {
 			console.log(`Socket ${err.name}: ${err.message}`);
-			// TODO display error message
+			toast.error(`${err.name}: ${err.message}`);
 			navigate('/dashboard');
 		});
 		socket.on("error", (args) => {
@@ -49,7 +50,7 @@ export default function Game() {
 				case 2:
 				case 3:
 					console.log("Could not join game: " + args.description);
-					// TODO display error message
+					toast.error(`Error while joining game: ${args.description}`);
 					navigate('/dashboard');
 					break;
 			}
