@@ -163,7 +163,6 @@ return (
 			<ResizablePanel>
 				<Editor
 					ref={opponentEditorRef}
-					className={styles.Editor}
 					onMount={handleOpponentEditorMount}
 					defaultValue={sessionStorage.getItem("opponent_editor_content") ?? default_opponent_editor_text}
 					defaultLanguage="cpp"
@@ -179,7 +178,6 @@ return (
 		<ResizablePanel defaultSize="66%" className={styles.rightPanel}>
 			<Editor
 				ref={editorRef}
-				className={styles.Editor}
 				onMount={handleEditorMount}
 				defaultValue={sessionStorage.getItem("editor_content") ?? default_editor_text}
 				defaultLanguage="cpp"
