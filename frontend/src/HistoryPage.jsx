@@ -54,7 +54,32 @@ export default function HistoryPage() {
 				<div><h2>{losses}</h2><p>Losses</p></div>
 				<div><h2>{winRatio}%</h2><p>Win Rate</p></div>
 			</div>
-			
+			<h2 style={{marginTop: 40}}>Past Games</h2>
+			<table style={{width: "100%", borderCollapse: "collapse"}}>
+				<thead>
+					<tr style={{ textAlign: "left", borderBottom: "1px solid #334155"}}>
+						<th style={{ padding: 10}}>Opponent</th>
+						<th style={{ padding: 10}}>Problem</th>
+						<th style={{ padding: 10}}>Result</th>
+					</tr>
+				</thead>
+				<tbody>
+					{completed.map((d) => {
+						const isPlayer1 = d.player1 === id;
+						const opponentId = isPlayer1 ? d.player2 : d.player1;
+						const won = (isPlayer1 && d.winner == 1) || (!isPlayer1 && d.winner === 2);
+						return (
+							<tr key={d.id} style={{ borderBottom: "1px solid #1e293b"}}>
+								<td style={{ padding:10 }}>Player #{opponentId}</td>
+								<td style={{ padding:10 }}>Problem #{d.problem}</td>
+								<td style={{ padding:10, color: won ? "#22c55e" : "#ef4444" }}>
+									{won ? "Win" : "Loss"}
+								</td>
+							</tr>
+						);
+					})}
+				</tbody>
+			</table>
 		</div>
 	);
 }
