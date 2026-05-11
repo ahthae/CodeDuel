@@ -5,6 +5,7 @@ import RegisterPage from "./RegisterPage";
 import Game from "./components/Game";
 import Dashboard from "./Dashboard";
 import HistoryPage from "./HistoryPage";
+import '@/index.css'
 
 export default function App() {
   return (

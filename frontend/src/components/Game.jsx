@@ -2,9 +2,11 @@ import Cookies from 'js-cookie';
 import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@monaco-editor/react';
 import { io } from 'socket.io-client';
-import styles from "./Game.module.css";
-import GameInfo from './GameInfo';
+import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
+import GameInfo from '@/components/GameInfo';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import styles from "./Game.module.css";
 
 const default_editor_text = `#include <iostream>
 
@@ -39,7 +41,7 @@ export default function Game() {
 	useEffect(() => {
 		socket.on("connect_error", (err) => {
 			console.log(`Socket ${err.name}: ${err.message}`);
-			// TODO display error message
+			toast.error(`Socket ${err.name}`, {description: `${err.message}`});
 			navigate('/dashboard');
 		});
 		socket.on("error", (args) => {
@@ -48,7 +50,7 @@ export default function Game() {
 				case 2:
 				case 3:
 					console.log("Could not join game: " + args.description);
-					// TODO display error message
+					toast.error("Error while joining game", {description: `Error message: ${args.description}`});
 					navigate('/dashboard');
 					break;
 			}
@@ -67,7 +69,7 @@ export default function Game() {
 			if (data.user_id == Cookies.get("user_id")) {
 				navigate("/game/"+data.game_id, { replace: true });
 			} else {
-				socket.emit("editor_update", editorRef.current.getValue());
+				socket.emit("editor_update", editorRef?.current.getValue());
 			}
 		});
 		socket.on("start", async problemId => {
@@ -86,6 +88,9 @@ export default function Game() {
 		socket.on("submission", (results) => {
 			for (const result of results) {
 				console.log(`${result.test_case_id}: ${result.status.description}`);
+				if (result.compile_output) {
+					console.log(atob(result.compile_output));
+				}
 			}
 			// TODO
 		});
@@ -142,40 +147,45 @@ export default function Game() {
 	};
 
 	const handleSubmit = () => {
-		socket.emit("submission", editorRef.current.getValue());
+		socket.emit("submission", btoa(editorRef.current.getValue()));
 	}
 
 return (
-  <div className={styles.gameContainer}>
+	<ResizablePanelGroup className={styles.leftPanel+" min-h-screen"}>
+		<ResizablePanel>
+			<ResizablePanelGroup orientation="vertical">
+			<ResizablePanel defaultSize="66%">
+				<GameInfo problem={problem} onSubmit={handleSubmit}/>
+			</ResizablePanel>
 
-    <div className={styles.leftPanel}>
-		<GameInfo problem={problem} onSubmit={handleSubmit}/>
+			<ResizableHandle />
 
-      <Editor
-	  	ref={opponentEditorRef}
-        className={styles.Editor}
-        onMount={handleOpponentEditorMount}
-        defaultValue={sessionStorage.getItem("opponent_editor_content") ?? default_opponent_editor_text}
-        defaultLanguage="cpp"
-		theme="vs-dark"
-        options={{ readOnly: true }}
-      />
-    </div>
+			<ResizablePanel>
+				<Editor
+					ref={opponentEditorRef}
+					onMount={handleOpponentEditorMount}
+					defaultValue={sessionStorage.getItem("opponent_editor_content") ?? default_opponent_editor_text}
+					defaultLanguage="cpp"
+					theme="vs-dark"
+					options={{ readOnly: true }}
+				/>
+			</ResizablePanel>
+			</ResizablePanelGroup>
+		</ResizablePanel>
 
-    <div className={styles.rightPanel}>
+		<ResizableHandle />
 
-      <Editor
-	  	ref={editorRef}
-        className={styles.Editor}
-        onMount={handleEditorMount}
-        defaultValue={sessionStorage.getItem("editor_content") ?? default_editor_text}
-        defaultLanguage="cpp"
-		theme="vs-dark"
-        options={{ readOnly: false }}
-        onChange={handleEditorChange}
-      />
-    </div>
-
-  </div>
+		<ResizablePanel defaultSize="66%" className={styles.rightPanel}>
+			<Editor
+				ref={editorRef}
+				onMount={handleEditorMount}
+				defaultValue={sessionStorage.getItem("editor_content") ?? default_editor_text}
+				defaultLanguage="cpp"
+				theme="vs-dark"
+				options={{ readOnly: false }}
+				onChange={handleEditorChange}
+			/>
+		</ResizablePanel>
+	</ResizablePanelGroup>
 );
 }

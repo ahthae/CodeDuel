@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+.problemDescription > table,tr,td,th {
+    border-width: 1px;
+    padding: calc(var(--spacing));
+    margin: calc(var(--spacing));
+}
+
+.problemDescription > ul {
+    list-style-type: disc;
+    list-style-position: outside;
+}
+
+.problemDescription > h2 {
+    margin: calc(var(--spacing));
+    font-size: var(--text-xl);
+    line-height: var(--text-xl--line-height);
+}
