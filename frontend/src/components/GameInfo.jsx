@@ -22,18 +22,40 @@ function ProblemDescription({problem}) {
     );
 }
 
-function TestCases({testCases, onSubmit}) {
-    function handleSubmit() { 
-        onSubmit();
-    }
-
+function TestCases({problem, onSubmit}) {
+	const testCases = problem?.test_cases ?? [];
     return (
-<Card>
-    <CardFooter>
-        <Button onClick={handleSubmit} className="w-full">Submit</Button>
-    </CardFooter>
-</Card>
-    );
+		<Card className="p-4 text-sm">
+			<CardContent className="space-y-4">
+				{testCases.length === 0 ? (
+					<p className="opacity-60">No test cases available</p>
+				) : (
+					testCases.map((tc, i) => (
+						<div key={tc.id}>
+							<h3 className="font-bold mb-2">Test case {i + 1}</h3>
+							<div className="grid grid-cols-2 gap-3">
+								<div>
+									<p className="opacity-60 mb-1 text-xs">Input</p>
+									<pre className="bg-slate-800 p-2 rounded text-xs whitespace-pre-wrap">
+										{tc.input}
+									</pre>
+								</div>
+								<div>
+									<p className="opacity-60 mb-1 text-xs">Expected Output</p>
+									<pre className="bg-slate-800 p-2 rounded text-xs whitespace-pre-wrap">
+										{tc.output}
+									</pre>
+								</div>
+							</div>
+						</div>
+					))
+				)}
+			</CardContent>
+			<CardFooter>
+				<Button onClick={onSubmit} className="w-full">Submit</Button>
+			</CardFooter>
+		</Card>
+	);
 }
 
 export default function GameInfo({problem, onSubmit}) {
@@ -48,7 +70,7 @@ export default function GameInfo({problem, onSubmit}) {
         <ProblemDescription problem={problem}/>
     </TabsContent>
     <TabsContent value="testCases">
-        <TestCases onSubmit={onSubmit}/>
+		<TestCases problem={problem} onSubmit={onSubmit}/>
     </TabsContent>
     <TabsContent value="opponent">
         {/* <div className={styles.opponentPanel}></div> */}
