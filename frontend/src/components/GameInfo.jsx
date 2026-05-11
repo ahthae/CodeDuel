@@ -1,22 +1,28 @@
-import { useRef } from "react";
 import { MathJax } from "better-react-mathjax";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "./ui/button";
 import styles from "./ProblemDescription.module.css";
 
-function ProblemDescription({problem}) {
+function ProblemDescription({problem, gameId}) {
     return (
 <>
     <Card className="p-4 text-sm">
         <CardHeader>
-            <h1 className="text-2xl text-center">{problem?.name}</h1>
+            <h1 className="text-2xl text-center">{problem?.name ?? "Waiting for players..."}</h1>
         </CardHeader>
+    {problem?.id ? (
         <CardContent>
             <MathJax inline>
                 <div className={styles.problemDescription} dangerouslySetInnerHTML={{__html: problem?.description}}></div>
             </MathJax>
         </CardContent>
+    ) : (
+        <CardContent>
+            <p className="text-center">Invite you friends! They can use the game ID to join the game:</p>
+            <h2 className="text-center font-mono">{gameId}</h2>
+        </CardContent>
+    )}
     </Card>
 </>
     );
@@ -58,7 +64,7 @@ function TestCases({problem, onSubmit}) {
 	);
 }
 
-export default function GameInfo({problem, onSubmit}) {
+export default function GameInfo({gameId, problem, onSubmit}) {
     return (
 <Tabs defaultValue="problem" className="p-3">
     <TabsList className="w-full h-9">
@@ -67,7 +73,7 @@ export default function GameInfo({problem, onSubmit}) {
         <TabsTrigger value="opponent">Opponent</TabsTrigger>
     </TabsList>
     <TabsContent value="problem">
-        <ProblemDescription problem={problem}/>
+        <ProblemDescription gameId={gameId} problem={problem}/>
     </TabsContent>
     <TabsContent value="testCases">
 		<TestCases problem={problem} onSubmit={onSubmit}/>

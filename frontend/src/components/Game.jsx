@@ -155,7 +155,7 @@ return (
 		<ResizablePanel>
 			<ResizablePanelGroup orientation="vertical">
 			<ResizablePanel defaultSize="66%">
-				<GameInfo problem={problem} onSubmit={handleSubmit}/>
+				<GameInfo gameId={gameId} problem={problem} onSubmit={handleSubmit}/>
 			</ResizablePanel>
 
 			<ResizableHandle />
