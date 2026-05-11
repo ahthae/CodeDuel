@@ -41,7 +41,7 @@ export default function Game() {
 	useEffect(() => {
 		socket.on("connect_error", (err) => {
 			console.log(`Socket ${err.name}: ${err.message}`);
-			toast.error(`${err.name}: ${err.message}`);
+			toast.error(`Socket ${err.name}`, {description: `${err.message}`});
 			navigate('/dashboard');
 		});
 		socket.on("error", (args) => {
@@ -50,7 +50,7 @@ export default function Game() {
 				case 2:
 				case 3:
 					console.log("Could not join game: " + args.description);
-					toast.error(`Error while joining game: ${args.description}`);
+					toast.error("Error while joining game", {description: `Error message: ${args.description}`});
 					navigate('/dashboard');
 					break;
 			}

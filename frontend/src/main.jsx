@@ -23,7 +23,7 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
   <MathJaxContext config={config}>
     <App />
-    <Toaster />
+    <Toaster position="top-center"/>
   </MathJaxContext>
   </StrictMode>,
 )
