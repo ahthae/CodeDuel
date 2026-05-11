@@ -150,8 +150,7 @@ export default function Game() {
 	}
 
 return (
-	<ResizablePanelGroup className="min-h-screen">
-		{/* <ResizablePanel className={styles.leftPanel}> */}
+	<ResizablePanelGroup className={styles.leftPanel+" min-h-screen"}>
 		<ResizablePanel>
 			<ResizablePanelGroup orientation="vertical">
 			<ResizablePanel defaultSize="66%">
@@ -163,7 +162,7 @@ return (
 			<ResizablePanel>
 				<Editor
 					ref={opponentEditorRef}
-					// className={styles.Editor}
+					className={styles.Editor}
 					onMount={handleOpponentEditorMount}
 					defaultValue={sessionStorage.getItem("opponent_editor_content") ?? default_opponent_editor_text}
 					defaultLanguage="cpp"
@@ -179,7 +178,7 @@ return (
 		<ResizablePanel defaultSize="66%" className={styles.rightPanel}>
 			<Editor
 				ref={editorRef}
-				// className={styles.Editor}
+				className={styles.Editor}
 				onMount={handleEditorMount}
 				defaultValue={sessionStorage.getItem("editor_content") ?? default_editor_text}
 				defaultLanguage="cpp"
