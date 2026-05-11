@@ -11,6 +11,7 @@ export default function HistoryPage() {
 	const [problems, setProblems] = useState({});
 
 	const userId = Cookies.get("user_id");
+	const myId = parseInt(userId);
 
 	useEffect(() => {
 		if (!userId) {
@@ -27,7 +28,7 @@ export default function HistoryPage() {
 		setDuels(data);
 		setLoading(false);
 
-		const opponentIds = [...new Set(data.flatMap((d) => [d.player1, d.player2]).filter((id) => id !== id && id !== null)
+		const opponentIds = [...new Set(data.flatMap((d) => [d.player1, d.player2]).filter((id) => id !== myId && id !== null)
 		)];
 		const problemIds = [...new Set(data.map((d) => d.problem).filter(Boolean)
 		)];
@@ -48,7 +49,7 @@ export default function HistoryPage() {
 		setError(err.message);
 		setLoading(false);
 	});
-	}, [userId, navigate]);
+	}, [userId, myId, navigate]);
 	
 	if (loading) return <div style={{ padding: 40, color: "white" }}>Loading</div>;
 	if (error) return <div style={{ padding: 40, color: "white" }}>Error: {error}</div>;
@@ -57,7 +58,7 @@ export default function HistoryPage() {
 	const completed = duels.filter((d) => d.winner !== null);
 	const gamesPlayed = completed.length;
 	const wins = completed.filter((d) => {
-		const isPlayer1 = d.player === id;
+		const isPlayer1 = d.player1 === id;
 		return (isPlayer1 && d.winner === 1) || (!isPlayer1 && d.winner === 2);
 	}).length;
 	const losses = gamesPlayed - wins;
@@ -89,8 +90,8 @@ export default function HistoryPage() {
 						const won = (isPlayer1 && d.winner === 1) || (!isPlayer1 && d.winner === 2);
 						return (
 							<tr key={d.id} style={{ borderBottom: "1px solid #1e293b"}}>
-								<td style={{ padding:10 }}>Player #{opponentId}</td>
-								<td style={{ padding:10 }}>Problem #{d.problem}</td>
+								<td style={{ padding:10 }}>{users[opponentId] ?? `Player #${opponentId}`}</td>
+								<td style={{ padding:10 }}>{problems[d.problem] ?? `Problem #${d.problem}`}</td>
 								<td style={{ padding:10, color: won ? "#22c55e" : "#ef4444" }}>
 									{won ? "Win" : "Loss"}
 								</td>
