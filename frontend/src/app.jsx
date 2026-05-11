@@ -18,7 +18,7 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/game/:gameId?" element={<Game/>} />
 		<Route path="/history" element={<HistoryPage/>} />
-		<Route path="/lobby" element={<Lobby/>} />
+		<Route path="/lobby" element={<Lobby user={user}/>} />
       </Routes>
     </BrowserRouter>
   );
