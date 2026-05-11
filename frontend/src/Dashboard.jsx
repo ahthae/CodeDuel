@@ -20,6 +20,10 @@ export default function Dashboard() {
     navigate("/game/"+roomCode);
   };
 
+  const handleViewHistory = () => {
+	navigate("/history");
+  };
+
   return (
     <div className="dashboard-container">
       <h1 className="dashboard-title">CodeDuel</h1>
@@ -54,6 +58,11 @@ export default function Dashboard() {
           Join
         </button>
       </div>
+	  <div className="dashboard-card">
+		<button className="secondary-btn" onClick={handleViewHistory}>
+			My History
+		</button>
+	  </div>
     </div>
   );
 }
