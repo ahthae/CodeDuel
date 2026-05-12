@@ -26,6 +26,11 @@ def create_app(test_config=None):
     app.register_blueprint(duel.bp)
     app.register_blueprint(problem.bp)
 
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def index(path):
+        return app.send_static_file("index.html")
+
     with app.app_context():
         models.db.create_all()
 

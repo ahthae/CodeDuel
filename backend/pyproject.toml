@@ -1,0 +1,20 @@
+[project]
+name = "codeduel"
+version = "1.0.0"
+description="1v1 Real-Time Coding Battles"
+dependencies = [
+    "Flask",
+    "Flask-Admin[sqlalchemy]",
+    "Flask-Argon2",
+    "Flask-Cors",
+    "Flask-JWT-Extended",
+    "Flask-SocketIO",
+    "Flask-SQLAlchemy",
+    "gevent",
+    "pytest",
+    "requests"
+]
+
+[build-system]
+requires = ["flit_core<4"]
+build-backend = "flit_core.buildapi"
