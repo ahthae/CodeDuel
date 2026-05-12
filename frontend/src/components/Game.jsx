@@ -39,7 +39,7 @@ export default function Game() {
 	const navigate = useNavigate();
 	const { gameId } = useParams();
 
-	const [socket, setSocket] = useState(io(undefined, {autoConnect: false, withCredentials: true}));
+	const [socket, setSocket] = useState(io(import.meta.env.VITE_SOCKET_URL || undefined, {autoConnect: false, withCredentials: true, transports: ['websocket']}));
     const [problem, setProblem] = useState(null);
     const [testCaseResults, setTestCaseResults] = useState([]);
 	const [ended, setEnded] = useState(false);
