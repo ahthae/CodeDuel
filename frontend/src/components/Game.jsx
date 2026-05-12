@@ -4,6 +4,8 @@ import { Editor } from '@monaco-editor/react';
 import { io } from 'socket.io-client';
 import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/dialog';
 import GameInfo from '@/components/GameInfo';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import styles from "./Game.module.css";
@@ -40,6 +42,9 @@ export default function Game() {
 	const [socket, setSocket] = useState(io(undefined, {autoConnect: false, withCredentials: true}));
     const [problem, setProblem] = useState(null);
     const [testCaseResults, setTestCaseResults] = useState([]);
+	const [ended, setEnded] = useState(false);
+	const [winner, setWinner] = useState(null);
+	const [resultDialogOpen, setResultDialogOpen] = useState(ended);
 
 	const editorRef = useRef(null);
 	const opponentEditorRef = useRef(null);
@@ -81,12 +86,8 @@ export default function Game() {
 		socket.on("start", async problemId => {
 			await updateProblem(problemId);
 		});
-		socket.on("end", (winner) => {
-			sessionStorage.removeItem("game_id");
-			sessionStorage.removeItem("editor_content");
-			sessionStorage.removeItem("opponent_editor_content");
-			// TODO
-			// game results screen or navigate?
+		socket.on("end", winner => {
+			handleGameEnd(winner);
 		});
 		socket.on("editor_update", (content) => {
 			updateOpponentEditor(content);
@@ -117,11 +118,36 @@ export default function Game() {
 		};
 	}, [socket]);
 
+	useEffect(() => {
+		const fetchGame = async id => {
+			if (!id) return;
+
+			const game = await (await fetch(`/api/duel/${id}`, {
+				headers: { 'X-CSRF-Token': Cookies.get("csrf_access_token") },
+				credentials: 'include'
+			})).json();
+
+			if (!ignore && game.winner) {
+				handleGameEnd(game.winner);
+			}
+		}
+
+		let ignore = false;
+		fetchGame(gameId);
+		return () => ignore = true;
+	}, []);
+
 	const fetchProblem = async problemId => {
 		return await (await fetch(`/api/problem/${problemId}`, {
 			headers: { 'X-CSRF-Token': Cookies.get("csrf_access_token") },
 			credentials: 'include'
 		})).json();
+	};
+
+	const handleGameEnd = winner => {
+		setWinner(winner);
+		setEnded(true);
+		setResultDialogOpen(true);
 	};
 
 	const updateProblem = async problemId => {
@@ -157,6 +183,28 @@ export default function Game() {
 	}
 
 return (
+<>
+	<Dialog open={resultDialogOpen} onOpenChange={(open)=> {
+			setResultDialogOpen(open)
+			if (!open) {
+				toast("This duel has ended.", {
+					duration: Infinity,
+					closeButton: true,
+					onDismiss: ()=>setResultDialogOpen(true)
+				});
+			}
+		}}>
+		<DialogContent>
+			<DialogHeader>
+				<div>
+					<h2 className="text-xl text-center">Duel Finished!</h2>
+				</div>
+			</DialogHeader>
+
+			<h3 className="text-lg text-center">{winner == Cookies.get("user_id") ? "You win!" : "You lost!"}</h3>
+		</DialogContent>
+	</Dialog>
+
 	<ResizablePanelGroup className={styles.leftPanel+" min-h-screen"}>
 		<ResizablePanel>
 			<ResizablePanelGroup orientation="vertical">
@@ -188,10 +236,11 @@ return (
 				defaultValue={sessionStorage.getItem("editor_content") ?? default_editor_text}
 				defaultLanguage="cpp"
 				theme="vs-dark"
-				options={{ readOnly: false }}
+				options={{ readOnly: ended }}
 				onChange={handleEditorChange}
 			/>
 		</ResizablePanel>
 	</ResizablePanelGroup>
+</>
 );
 }

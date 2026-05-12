@@ -7,7 +7,6 @@ import Game from "./components/Game";
 import Dashboard from "./Dashboard";
 import HistoryPage from "./HistoryPage";
 import '@/index.css'
-import Lobby from "./components/Lobby";
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -27,8 +26,7 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={<Dashboard user={user}/>} />
         <Route path="/game/:gameId?" element={<Game user={user}/>} />
-		<Route path="/history" element={<HistoryPage user={user}/>} />
-		<Route path="/lobby" element={<Lobby user={user}/>} />
+        <Route path="/history" element={<HistoryPage user={user}/>} />
       </Routes>
     </BrowserRouter>
   );
