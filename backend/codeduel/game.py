@@ -161,8 +161,7 @@ def submission_handler(data: dict):
         }
         i += 1
     sio.emit('submission', results, room=game.game_id.int)
-    # if did_pass and model.state == GameState.STARTED:
-    if model.state == GameState.STARTED:
+    if did_pass and model.state == GameState.STARTED:
         game.end(session['user'])
         sio.emit('end', session['user'].id, room=game.game_id.int)
 
