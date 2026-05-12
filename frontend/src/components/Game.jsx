@@ -28,6 +28,11 @@ int main(){
 }
 `;
 
+// Decodes a base 64 encoded UTF-8 string as sent by Judge0 into a UTF-16 JavaScript string
+function decodeResultBase64(base64) {
+	return new TextDecoder().decode(Uint8Array.from(atob(base64), m => m.codePointAt(0)));
+}
+
 export default function Game() {
 	const navigate = useNavigate();
 	const { gameId } = useParams();
@@ -88,14 +93,9 @@ export default function Game() {
 		});
 		socket.on("submission", (results) => {
 			for (const result of results) {
-				console.log(`${result.test_case_id}: ${result.status.description}`);
-				if (result.compile_output) {
-					console.log(atob(result.compile_output));
-				}
-
-				if (result.compile_output) result.compile_output = atob(result.compile_output);
-				if (result.stdout) result.stdout = atob(result.stdout);
-				if (result.stderr) result.stderr = atob(result.stderr);
+				if (result.compile_output) result.compile_output = decodeResultBase64(result.compile_output);
+				if (result.stdout) result.stdout = decodeResultBase64(result.stdout);
+				if (result.stderr) result.stderr = decodeResultBase64(result.stderr);
 			}
 			setTestCaseResults(results);
 		});
@@ -152,6 +152,7 @@ export default function Game() {
 	};
 
 	const handleSubmit = () => {
+		setTestCaseResults([]);
 		socket.emit("submission", btoa(editorRef.current.getValue()));
 	}
 

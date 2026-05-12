@@ -1,8 +1,11 @@
 import { MathJax } from "better-react-mathjax";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { useState } from "react";
-import { Button } from "./ui/button";
+import Pre from "@/components/Pre";
+import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
 import styles from "./ProblemDescription.module.css";
 
 function ProblemDescription({problem, gameId}) {
@@ -29,19 +32,44 @@ function ProblemDescription({problem, gameId}) {
     );
 }
 
-function TestCaseResults({results}) {
+function TestCaseResults({testCases, results}) {
     return (
 <>
     <Card>
         <CardContent className="space-y-4">
-            {results?.map((result, i) => 
-                    <div key={result.test_case_id} className="flex">
+            {results?.length !== 0 ? results?.map((result, i) => 
+                <Collapsible key={result.test_case_id} className="flex flex-col gap-3">
+                    <div className="flex items-center">
                         <h2 className="grow text-sm font-bold">Test case {i+1}</h2>
                         <div className="grow">
                             <span className={"text-sm "+(result.status.id === 3 ? "text-constructive" : "text-destructive")}>{result.status.description}</span> 
                         </div>
-                        <Button className="w-12">Info</Button>
+                        <CollapsibleTrigger asChild>
+                            <Button className="w-12">Info</Button>
+                        </CollapsibleTrigger>
                     </div>
+                    <CollapsibleContent>
+                        <Card>
+                            <CardContent className="flex flex-col gap-3">
+                                <div className="grid grid-cols-3 gap-3">
+                                    <Pre title="Input">{testCases[i].input}</Pre>
+                                    <Pre title="Output">{testCases[i].output}</Pre>
+                                    <Pre title="Acutual Output">{result.stdout}</Pre>
+                                </div>
+
+                                <Pre title="Compiler Output">{result.compile_output}</Pre>
+                                <Pre title="stderr">{result.stderr}</Pre>
+                            </CardContent>
+                        </Card>
+                    </CollapsibleContent>
+                </Collapsible>
+                ) 
+            : (
+                <>
+                    <Skeleton className="w-full h-5" />
+                    <Skeleton className="w-full h-5" />
+                    <Skeleton className="w-full h-5" />
+                </>
             )}
         </CardContent>
     </Card>
@@ -61,18 +89,8 @@ function TestCases({problem, onSubmit}) {
 						<div key={tc.id}>
 							<h3 className="font-bold mb-2">Test case {i + 1}</h3>
 							<div className="grid grid-cols-2 gap-3">
-								<div>
-									<p className="opacity-60 mb-1 text-xs">Input</p>
-									<pre className="bg-slate-800 p-2 rounded text-xs whitespace-pre-wrap">
-										{tc.input}
-									</pre>
-								</div>
-								<div>
-									<p className="opacity-60 mb-1 text-xs">Expected Output</p>
-									<pre className="bg-slate-800 p-2 rounded text-xs whitespace-pre-wrap">
-										{tc.output}
-									</pre>
-								</div>
+                                <Pre title="Input">{tc.input}</Pre>
+                                <Pre title="Expected Output">{tc.output}</Pre>
 							</div>
 						</div>
 					))
@@ -106,7 +124,7 @@ export default function GameInfo({gameId, problem, testCaseResults, onSubmit}) {
 		<TestCases problem={problem} onSubmit={handleSubmit}/>
     </TabsContent>
     <TabsContent value="results">
-        <TestCaseResults results={testCaseResults}/>
+        <TestCaseResults testCases={problem?.test_cases} results={testCaseResults}/>
     </TabsContent>
     <TabsContent value="opponent">
         {/* <div className={styles.opponentPanel}></div> */}
