@@ -3,7 +3,7 @@ from flask_socketio import SocketIOTestClient
 from uuid import UUID
 
 from codeduel.game import sio, games
-from codeduel.models import db
+from codeduel.models import db, Duel
 
 def test_connect_unauthorized(app, client):
     sio_client = SocketIOTestClient(app, sio, flask_test_client=client)
@@ -92,3 +92,8 @@ int main() {
     assert received2['name'] == 'end'
     assert received['args'][0] == 1 # Player 1 won
     assert received2['args'][0] == 1 # Player 2 is notified player 1 won
+
+    with game.sio_client.app.app_context():
+        duel = db.session.get(Duel, UUID(game_id))
+        assert duel is not None
+        assert duel.winner == 1

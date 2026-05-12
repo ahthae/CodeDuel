@@ -33,7 +33,7 @@ def create_app(test_config=None):
 
 def init_db(app: Flask) -> None:
     import codeduel
-    from codeduel.models import db, Duel, Problem, TestCase, User
+    from codeduel.models import db, Duel, GameState, Problem, TestCase, User
 
     with open('example_data/example_data.json', 'r') as f:
         data = json.load(f)
@@ -48,7 +48,8 @@ def init_db(app: Flask) -> None:
                     Duel(player1=duel['player1'],
                          player2=duel['player2'],
                          problem=duel['problem'],
-                         winner=duel['winner'])
+                         winner=duel['winner'],
+                         state=GameState.FINISHED)
                     for duel in data['duels']])
             for problem in data['problems']:
                 record = Problem(name=problem['name'])

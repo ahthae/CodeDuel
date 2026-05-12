@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import socket from '../socket'; // Assuming you have a centralized socket instance
 
 const Lobby = ({ user }) => {

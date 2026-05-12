@@ -3,9 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Editor } from '@monaco-editor/react';
 import { io } from 'socket.io-client';
 import { toast } from 'sonner';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import GameInfo from '@/components/GameInfo';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import styles from "./Game.module.css";
@@ -37,13 +37,14 @@ function decodeResultBase64(base64) {
 
 export default function Game() {
 	const navigate = useNavigate();
-	const { gameId } = useParams();
+	const params = useParams();
+	const gameId = params.gameId;
 
 	const [socket, setSocket] = useState(io(import.meta.env.VITE_SOCKET_URL || undefined, {autoConnect: false, withCredentials: true, transports: ['websocket']}));
     const [problem, setProblem] = useState(null);
     const [testCaseResults, setTestCaseResults] = useState([]);
 	const [ended, setEnded] = useState(false);
-	const [winner, setWinner] = useState(null);
+	const [game, setGame] = useState(null);
 	const [resultDialogOpen, setResultDialogOpen] = useState(ended);
 
 	const editorRef = useRef(null);
@@ -86,8 +87,10 @@ export default function Game() {
 		socket.on("start", async problemId => {
 			await updateProblem(problemId);
 		});
-		socket.on("end", winner => {
-			handleGameEnd(winner);
+		socket.on("end", async winnerIdx => {
+			const game = await fetchGame(gameId);
+			setGame(game);
+			handleGameEnd(game);
 		});
 		socket.on("editor_update", (content) => {
 			updateOpponentEditor(content);
@@ -116,26 +119,30 @@ export default function Game() {
 			socket.disconnect()
 			console.log("Socket disconnected.");
 		};
-	}, [socket]);
+	}, [socket, gameId]);
 
+	// Fetch the inital state of the game
 	useEffect(() => {
-		const fetchGame = async id => {
-			if (!id) return;
-
-			const game = await (await fetch(`/api/duel/${id}`, {
-				headers: { 'X-CSRF-Token': Cookies.get("csrf_access_token") },
-				credentials: 'include'
-			})).json();
-
-			if (!ignore && game.winner) {
-				handleGameEnd(game.winner);
+		async function startFetchGame(gameId) {
+			const game = await fetchGame(gameId);
+			if (!ignore && game) {
+				setGame(game);
+				if (game.winner) { handleGameEnd(game); }
 			}
 		}
 
 		let ignore = false;
-		fetchGame(gameId);
+		startFetchGame(gameId);
 		return () => ignore = true;
 	}, []);
+
+	const fetchGame = async id => {
+		if (!id) return;
+		return await (await fetch(`/api/duel/${id}`, {
+			headers: { 'X-CSRF-Token': Cookies.get("csrf_access_token") },
+			credentials: 'include'
+		})).json();
+	}
 
 	const fetchProblem = async problemId => {
 		return await (await fetch(`/api/problem/${problemId}`, {
@@ -144,8 +151,7 @@ export default function Game() {
 		})).json();
 	};
 
-	const handleGameEnd = winner => {
-		setWinner(winner);
+	const handleGameEnd = game => {
 		setEnded(true);
 		setResultDialogOpen(true);
 	};
@@ -182,6 +188,12 @@ export default function Game() {
 		socket.emit("submission", btoa(editorRef.current.getValue()));
 	}
 
+	const isWinner = game => {
+		if (!game) return false;
+		const user_id = Cookies.get("user_id");
+		return game.winner === 1 ? game.player1 == user_id : game.player2 == user_id;
+	}
+
 return (
 <>
 	<Dialog open={resultDialogOpen} onOpenChange={(open)=> {
@@ -196,12 +208,15 @@ return (
 		}}>
 		<DialogContent>
 			<DialogHeader>
-				<div>
-					<h2 className="text-xl text-center">Duel Finished!</h2>
-				</div>
+				<DialogTitle>
+
+					<div>
+						<h2 className="text-xl text-center">Duel Finished!</h2>
+					</div>
+				</DialogTitle>
 			</DialogHeader>
 
-			<h3 className="text-lg text-center">{winner == Cookies.get("user_id") ? "You win!" : "You lost!"}</h3>
+			<h3 className="text-lg text-center">{isWinner(game) ? "You win!" : "You lost!"}</h3>
 		</DialogContent>
 	</Dialog>
 
