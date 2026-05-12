@@ -34,6 +34,7 @@ export default function Game() {
 
 	const [socket, setSocket] = useState(io(undefined, {autoConnect: false, withCredentials: true}));
     const [problem, setProblem] = useState(null);
+    const [testCaseResults, setTestCaseResults] = useState([]);
 
 	const editorRef = useRef(null);
 	const opponentEditorRef = useRef(null);
@@ -91,8 +92,12 @@ export default function Game() {
 				if (result.compile_output) {
 					console.log(atob(result.compile_output));
 				}
+
+				if (result.compile_output) result.compile_output = atob(result.compile_output);
+				if (result.stdout) result.stdout = atob(result.stdout);
+				if (result.stderr) result.stderr = atob(result.stderr);
 			}
-			// TODO
+			setTestCaseResults(results);
 		});
 
 		socket.connect();
@@ -155,10 +160,10 @@ return (
 		<ResizablePanel>
 			<ResizablePanelGroup orientation="vertical">
 			<ResizablePanel defaultSize="66%">
-				<GameInfo gameId={gameId} problem={problem} onSubmit={handleSubmit}/>
+				<GameInfo gameId={gameId} problem={problem} testCaseResults={testCaseResults} onSubmit={handleSubmit}/>
 			</ResizablePanel>
 
-			<ResizableHandle />
+			<ResizableHandle withHandle />
 
 			<ResizablePanel>
 				<Editor
@@ -173,7 +178,7 @@ return (
 			</ResizablePanelGroup>
 		</ResizablePanel>
 
-		<ResizableHandle />
+		<ResizableHandle withHandle />
 
 		<ResizablePanel defaultSize="66%" className={styles.rightPanel}>
 			<Editor

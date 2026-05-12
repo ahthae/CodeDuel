@@ -1,6 +1,7 @@
 import { MathJax } from "better-react-mathjax";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import styles from "./ProblemDescription.module.css";
 
@@ -23,6 +24,26 @@ function ProblemDescription({problem, gameId}) {
             <h2 className="text-center font-mono">{gameId}</h2>
         </CardContent>
     )}
+    </Card>
+</>
+    );
+}
+
+function TestCaseResults({results}) {
+    return (
+<>
+    <Card>
+        <CardContent className="space-y-4">
+            {results?.map((result, i) => 
+                    <div key={result.test_case_id} className="flex">
+                        <h2 className="grow text-sm font-bold">Test case {i+1}</h2>
+                        <div className="grow">
+                            <span className={"text-sm "+(result.status.id === 3 ? "text-constructive" : "text-destructive")}>{result.status.description}</span> 
+                        </div>
+                        <Button className="w-12">Info</Button>
+                    </div>
+            )}
+        </CardContent>
     </Card>
 </>
     );
@@ -64,19 +85,28 @@ function TestCases({problem, onSubmit}) {
 	);
 }
 
-export default function GameInfo({gameId, problem, onSubmit}) {
+export default function GameInfo({gameId, problem, testCaseResults, onSubmit}) {
+    const [tab, setTab] = useState("problem");
+    function handleSubmit() {
+        setTab("results");
+        onSubmit();
+    }
     return (
-<Tabs defaultValue="problem" className="p-3">
+<Tabs value={tab} onValueChange={(value)=>setTab(value)} className="p-3">
     <TabsList className="w-full h-9">
         <TabsTrigger value="problem">Problem</TabsTrigger>
         <TabsTrigger value="testCases">Test Cases</TabsTrigger>
+        <TabsTrigger value="results">Test Case Results</TabsTrigger>
         <TabsTrigger value="opponent">Opponent</TabsTrigger>
     </TabsList>
     <TabsContent value="problem">
         <ProblemDescription gameId={gameId} problem={problem}/>
     </TabsContent>
     <TabsContent value="testCases">
-		<TestCases problem={problem} onSubmit={onSubmit}/>
+		<TestCases problem={problem} onSubmit={handleSubmit}/>
+    </TabsContent>
+    <TabsContent value="results">
+        <TestCaseResults results={testCaseResults}/>
     </TabsContent>
     <TabsContent value="opponent">
         {/* <div className={styles.opponentPanel}></div> */}
