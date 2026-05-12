@@ -1,0 +1,6 @@
+{
+	"rewrites": [
+		{ "source": "/api/:path*", "destination": "https://generic-before-density-distinguished.trycloudflare.com/api/:path*"},
+		{ "source": "/socket.io/:path*", "destination": "https://generic-before-density-distinguished.trycloudflare.com/socket.io/:path*" }
+	]	
+}
